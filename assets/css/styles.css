@@ -1,0 +1,152 @@
+:root {
+    --primary: #3498db;
+    --secondary: #2ecc71;
+    --warning: #f39c12;
+    --danger: #e74c3c;
+    --light: #f8f9fa;
+    --dark: #343a40;
+    --gray: #6c757d;
+    --light-gray: #dee2e6;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f7fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+footer {
+    margin-top: auto;
+}
+
+/* Estilos de la lista de recordatorios */
+.reminders-container {
+    max-height: calc(100vh - 250px);
+    overflow-y: auto;
+}
+
+.reminder-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-bottom: 1rem;
+    border-left: 5px solid var(--primary);
+}
+
+.reminder-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.reminder-card.overdue {
+    border-left-color: var(--danger);
+}
+
+.reminder-card.today {
+    border-left-color: var(--warning);
+}
+
+.reminder-card.completed {
+    border-left-color: var(--secondary);
+    opacity: 0.7;
+}
+
+/* Estilos para las tags */
+.tag-badge {
+    cursor: pointer;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    border-radius: 20px;
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    transition: transform 0.1s;
+}
+
+.tag-badge:hover {
+    transform: scale(1.05);
+}
+
+.tag-badge.active {
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilos para el editor Quill */
+.ql-container.ql-snow {
+    height: auto !important;
+    min-height: 150px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.ql-editor {
+    min-height: 150px;
+}
+
+.ql-toolbar.ql-snow {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+.ql-container.ql-snow {
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+/* Estilos para imágenes en el editor */
+.ql-editor img {
+    max-width: 100%;
+    height: auto;
+    margin: 10px 0;
+    display: block;
+}
+
+/* Estilos para tablas */
+.reminder-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+}
+
+.reminder-table th, 
+.reminder-table td {
+    border: 1px solid var(--light-gray);
+    padding: 8px;
+}
+
+.reminder-table th {
+    background-color: var(--light);
+    font-weight: bold;
+}
+
+/* Estilos para notificaciones */
+.toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1050;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .reminders-container {
+        max-height: calc(100vh - 200px);
+    }
+    
+    .reminder-actions {
+        flex-wrap: wrap;
+    }
+    
+    .reminder-actions .btn {
+        margin-bottom: 5px;
+    }
+}

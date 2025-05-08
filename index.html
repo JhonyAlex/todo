@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recordatorios App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <link href="assets/css/styles.css" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="assets/img/favicon.png">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="assets/img/logo.png" alt="Logo" width="30" height="30" class="d-inline-block align-text-top me-2">
+                Recordatorios App
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" id="nav-all">Todos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="nav-today">Hoy</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="nav-upcoming">Próximos</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <button class="btn btn-light me-2" id="btn-export" title="Exportar datos">
+                        <i class="bi bi-download"></i>
+                    </button>
+                    <button class="btn btn-light me-2" id="btn-import" title="Importar datos">
+                        <i class="bi bi-upload"></i>
+                    </button>
+                    <input type="file" id="import-file" accept=".json" hidden>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <!-- Filtros y etiquetas -->
+            <div class="col-lg-3 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Etiquetas</h5>
+                        <button class="btn btn-sm btn-outline-primary" id="btn-add-tag">
+                            <i class="bi bi-plus"></i>
+                        </button>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush" id="tag-list">
+                            <!-- Tags will be loaded here -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de recordatorios -->
+            <div class="col-lg-9">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 id="current-view-title">Todos los recordatorios</h2>
+                    <button class="btn btn-primary" id="btn-new-reminder">
+                        <i class="bi bi-plus"></i> Nuevo recordatorio
+                    </button>
+                </div>
+
+                <!-- Barra de búsqueda -->
+                <div class="input-group mb-3">
+                    <span class="input-group-text">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" class="form-control" id="search-input" placeholder="Buscar recordatorios...">
+                </div>
+
+                <!-- Lista de recordatorios -->
+                <div id="reminders-list" class="reminders-container">
+                    <!-- Reminders will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para crear/editar recordatorio -->
+    <div class="modal fade" id="reminderModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-title">Nuevo recordatorio</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="reminder-form">
+                        <input type="hidden" id="reminder-id">
+                        <div class="mb-3">
+                            <label for="reminder-title" class="form-label">Título</label>
+                            <input type="text" class="form-control" id="reminder-title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reminder-assignee" class="form-label">Destinatario</label>
+                            <input type="text" class="form-control" id="reminder-assignee" placeholder="¿Para quién es esta tarea?">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="reminder-date" class="form-label">Fecha</label>
+                                <input type="date" class="form-control" id="reminder-date" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="reminder-time" class="form-label">Hora</label>
+                                <input type="time" class="form-control" id="reminder-time" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editor-container" class="form-label">Descripción</label>
+                            <div id="editor-container" class="form-control" style="height: 200px;"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Etiquetas</label>
+                            <div class="d-flex flex-wrap gap-2" id="tag-selection">
+                                <!-- Tags will be loaded here for selection -->
+                            </div>
+                            <div class="input-group mt-2">
+                                <input type="text" class="form-control" id="new-tag-input" placeholder="Nueva etiqueta">
+                                <button class="btn btn-outline-secondary" type="button" id="add-tag-btn">Agregar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="save-reminder">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación para eliminar -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas eliminar este recordatorio? Esta acción no se puede deshacer.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="confirm-delete">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para exportar/importar -->
+    <div class="modal fade" id="exportImportModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exportImportTitle">Exportar datos</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="exportImportBody">
+                    <!-- Content will be set dynamically -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" id="exportImportAction">Exportar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="mt-5 py-3 bg-light text-center">
+        <div class="container">
+            <p class="mb-0">Recordatorios App © 2025</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"></script>
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <script src="js/services/db-service.js"></script>
+    <script src="js/services/notification-service.js"></script>
+    <script src="js/components/reminder-editor.js"></script>
+    <script src="js/components/reminder-list.js"></script>
+    <script src="js/components/tag-manager.js"></script>
+    <script src="js/utils/date-utils.js"></script>
+    <script src="js/utils/export-import.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // Registrar Service Worker para las notificaciones en segundo plano
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => console.log('Service Worker registrado correctamente', registration))
+                    .catch(err => console.error('Error al registrar Service Worker', err));
+            });
+        }
+    </script>
+</body>
+</html>
