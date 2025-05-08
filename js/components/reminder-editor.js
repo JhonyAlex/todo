@@ -22,10 +22,8 @@ class ReminderEditor {
           [{ 'list': 'ordered' }, { 'list': 'bullet' }],
           [{ 'color': [] }, { 'background': [] }],
           ['image', 'link'],
-          [{ 'table': {} }],
           ['clean']
-        ],
-        table: true
+        ]
       },
       placeholder: '¿Qué necesitas recordar?',
       theme: 'snow'
