@@ -1,15 +1,25 @@
 // Service Worker para gestionar notificaciones
 
-const CACHE_NAME = 'reminders-app-cache-v1';
+const CACHE_NAME = 'todo-cache-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/assets/css/styles.css',
-  '/js/app.js',
-  '/js/services/db-service.js',
-  '/js/services/notification-service.js',
-  // Añadir otros archivos importantes
+  './',
+  './index.html',
+  './assets/css/styles.css',
+  './assets/img/logo.png',
+  './assets/img/favicon.png',
+  './js/services/db-service.js',
+  './js/services/notification-service.js',
+  './js/components/reminder-editor.js',
+  './js/components/reminder-list.js',
+  './js/components/tag-manager.js',
+  './js/utils/date-utils.js',
+  './js/utils/export-import.js',
+  './js/app.js',
+  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
+  'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css',
+  'https://cdn.quilljs.com/1.3.6/quill.snow.css',
+  'https://cdn.quilljs.com/1.3.6/quill.min.js',
+  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js'
 ];
 
 // Instalación del Service Worker
