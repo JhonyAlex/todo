@@ -9,33 +9,35 @@ const DateUtils = {
    * @returns {string} Fecha formateada
    */
   formatDate(date, includeTime = true) {
-    if (!date) return '';
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
     
-    const dateObj = new Date(date);
-    const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    const timeOptions = { hour: '2-digit', minute: '2-digit' };
+    const options = { 
+      weekday: 'short', 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric'
+    };
     
     if (includeTime) {
-      return `${dateObj.toLocaleDateString('es-ES', dateOptions)} ${dateObj.toLocaleTimeString('es-ES', timeOptions)}`;
+      options.hour = '2-digit';
+      options.minute = '2-digit';
     }
     
-    return dateObj.toLocaleDateString('es-ES', dateOptions);
+    return dateObj.toLocaleDateString(undefined, options);
   },
   
   /**
    * Comprueba si una fecha es hoy
-   * @param {string|Date} date - Fecha a comprobar
+   * @param {Date|string} date - Fecha a comprobar
    * @returns {boolean} true si es hoy
    */
   isToday(date) {
-    if (!date) return false;
-    
-    const dateObj = new Date(date);
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
     const today = new Date();
     
     return dateObj.getDate() === today.getDate() &&
-      dateObj.getMonth() === today.getMonth() &&
-      dateObj.getFullYear() === today.getFullYear();
+           dateObj.getMonth() === today.getMonth() &&
+           dateObj.getFullYear() === today.getFullYear();
   },
   
   /**
@@ -77,6 +79,17 @@ const DateUtils = {
   },
   
   /**
+   * Añade el número especificado de minutos a la fecha actual
+   * @param {number} minutes - Minutos a añadir
+   * @returns {Date} Nueva fecha
+   */
+  addMinutes(minutes) {
+    const date = new Date();
+    date.setMinutes(date.getMinutes() + minutes);
+    return date;
+  },
+  
+  /**
    * Calcula el tiempo restante en formato legible
    * @param {string|Date} futureDate - Fecha futura
    * @returns {string} Tiempo restante en formato legible
@@ -104,5 +117,25 @@ const DateUtils = {
     }
     
     return `${diffMinutes}m`;
+  },
+  
+  /**
+   * Obtiene el inicio del día actual
+   * @returns {Date} Fecha con hora 00:00:00
+   */
+  startOfDay() {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    return date;
+  },
+  
+  /**
+   * Obtiene el final del día actual
+   * @returns {Date} Fecha con hora 23:59:59
+   */
+  endOfDay() {
+    const date = new Date();
+    date.setHours(23, 59, 59, 999);
+    return date;
   }
 };

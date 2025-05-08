@@ -1,67 +1,50 @@
 /**
  * Utilidades para exportación e importación de datos
  */
-class ExportImportUtils {
-  constructor() {
-    // Referencias DOM
+const exportImportUtils = {
+  /**
+   * Inicializa los eventos de exportación/importación
+   */
+  init() {
     this.exportBtn = document.getElementById('btn-export');
     this.importBtn = document.getElementById('btn-import');
-    this.importFileInput = document.getElementById('import-file');
+    this.importFile = document.getElementById('import-file');
     this.exportImportModal = new bootstrap.Modal(document.getElementById('exportImportModal'));
     this.exportImportTitle = document.getElementById('exportImportTitle');
     this.exportImportBody = document.getElementById('exportImportBody');
     this.exportImportAction = document.getElementById('exportImportAction');
-  }
-
-  /**
-   * Inicializa las utilidades de exportación/importación
-   */
-  init() {
-    // Configurar eventos
+    
     this.exportBtn.addEventListener('click', this.handleExport.bind(this));
-    this.importBtn.addEventListener('click', () => this.importFileInput.click());
-    this.importFileInput.addEventListener('change', this.handleImportFileSelect.bind(this));
-  }
-
+    this.importBtn.addEventListener('click', this.handleImportClick.bind(this));
+    this.importFile.addEventListener('change', this.handleImportFile.bind(this));
+  },
+  
   /**
-   * Maneja la exportación de datos
+   * Maneja el evento de exportación
    */
   async handleExport() {
     try {
-      // Obtener todos los datos
       const data = await dbService.exportData();
-      
-      // Convertir a JSON
-      const jsonData = JSON.stringify(data, null, 2);
-      
-      // Crear blob
-      const blob = new Blob([jsonData], { type: 'application/json' });
-      
-      // Crear URL para descargar
+      const jsonStr = JSON.stringify(data, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       
-      // Mostrar modal con opciones
       this.exportImportTitle.textContent = 'Exportar datos';
       this.exportImportBody.innerHTML = `
-        <p>Estás a punto de descargar un archivo con todos tus recordatorios y etiquetas.</p>
-        <p>Este archivo te permitirá restaurar tus datos en cualquier momento.</p>
-        <div class="alert alert-info">
-          <i class="bi bi-info-circle"></i> Se exportarán ${data.reminders.length} recordatorios y ${data.tags.length} etiquetas.
-        </div>
+        <p>Los datos han sido preparados para la exportación. Haz clic en el botón "Descargar" para guardar el archivo.</p>
+        <p class="text-muted">Fecha de exportación: ${new Date().toLocaleString()}</p>
+        <p class="text-muted">Número de recordatorios: ${data.reminders.length}</p>
+        <p class="text-muted">Número de etiquetas: ${data.tags.length}</p>
       `;
-      
       this.exportImportAction.textContent = 'Descargar';
       this.exportImportAction.onclick = () => {
-        // Crear enlace de descarga
         const a = document.createElement('a');
         a.href = url;
-        a.download = `reminders-backup-${new Date().toISOString().split('T')[0]}.json`;
+        a.download = `recordatorios-export-${new Date().toISOString().slice(0, 10)}.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        
-        // Cerrar modal
         this.exportImportModal.hide();
       };
       
@@ -70,102 +53,84 @@ class ExportImportUtils {
       console.error('Error al exportar datos:', error);
       alert('Error al exportar los datos');
     }
-  }
-
+  },
+  
+  /**
+   * Maneja el clic en el botón de importación
+   */
+  handleImportClick() {
+    this.importFile.click();
+  },
+  
   /**
    * Maneja la selección de archivo para importar
-   * @param {Event} event - Evento de selección de archivo
+   * @param {Event} event - Evento de cambio de archivo
    */
-  async handleImportFileSelect(event) {
+  handleImportFile(event) {
     const file = event.target.files[0];
     if (!file) return;
     
-    try {
-      // Leer archivo
-      const fileContent = await this.readFileAsText(file);
-      
-      // Parsear JSON
-      const data = JSON.parse(fileContent);
-      
-      // Validar datos
-      if (!data || !data.reminders || !data.tags) {
-        throw new Error('El archivo no contiene datos válidos');
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target.result);
+        
+        this.exportImportTitle.textContent = 'Importar datos';
+        this.exportImportBody.innerHTML = `
+          <div class="alert alert-warning">
+            <h5>¡Atención!</h5>
+            <p>Estás a punto de importar datos que reemplazarán los datos existentes.</p>
+            <p><strong>Esta acción no se puede deshacer.</strong></p>
+          </div>
+          <p>Información del archivo:</p>
+          <ul>
+            <li>Fecha de exportación: ${new Date(data.exportDate || Date.now()).toLocaleString()}</li>
+            <li>Recordatorios: ${data.reminders ? data.reminders.length : 'No disponible'}</li>
+            <li>Etiquetas: ${data.tags ? data.tags.length : 'No disponible'}</li>
+          </ul>
+          <p>¿Estás seguro de que deseas continuar?</p>
+        `;
+        this.exportImportAction.textContent = 'Importar';
+        this.exportImportAction.onclick = () => {
+          this.confirmImport(data);
+        };
+        
+        this.exportImportModal.show();
+      } catch (error) {
+        console.error('Error al leer el archivo:', error);
+        alert('El archivo seleccionado no es válido');
       }
       
-      // Mostrar modal de confirmación
-      this.exportImportTitle.textContent = 'Importar datos';
-      this.exportImportBody.innerHTML = `
-        <p>Estás a punto de importar datos de un archivo de respaldo.</p>
-        <div class="alert alert-warning">
-          <i class="bi bi-exclamation-triangle"></i> <strong>Atención:</strong> Esta acción reemplazará todos tus datos actuales.
-        </div>
-        <p class="mb-0">El archivo contiene:</p>
-        <ul>
-          <li>${data.reminders.length} recordatorios</li>
-          <li>${data.tags.length} etiquetas</li>
-          <li>Fecha de exportación: ${new Date(data.exportDate).toLocaleDateString('es-ES')}</li>
-        </ul>
-        <p>¿Deseas continuar?</p>
-      `;
+      // Limpiar el input para permitir seleccionar el mismo archivo de nuevo
+      event.target.value = '';
+    };
+    
+    reader.readAsText(file);
+  },
+  
+  /**
+   * Confirma la importación de datos
+   * @param {Object} data - Datos a importar
+   */
+  async confirmImport(data) {
+    try {
+      await dbService.importData(data);
       
-      this.exportImportAction.textContent = 'Importar';
-      this.exportImportAction.onclick = async () => {
-        try {
-          await dbService.importData(data);
-          
-          // Cerrar modal
-          this.exportImportModal.hide();
-          
-          // Recargar datos
-          if (tagManager) await tagManager.loadTags();
-          if (reminderList) await reminderList.loadRecords;
-          
-          // Programar notificaciones para recordatorios importados
-          data.reminders.forEach(reminder => {
-            if (!reminder.completed && new Date(reminder.date) > new Date()) {
-              notificationService.scheduleNotification(reminder);
-            }
-          });
-          
-          alert('Datos importados correctamente');
-          
-          // Limpiar input de archivo
-          this.importFileInput.value = '';
-          
-        } catch (error) {
-          console.error('Error al importar datos:', error);
-          alert(`Error al importar datos: ${error.message}`);
-        }
-      };
+      // Actualizar componentes
+      if (window.tagManager) {
+        await tagManager.loadTags();
+      }
       
-      this.exportImportModal.show();
+      if (window.reminderList) {
+        await reminderList.loadReminders();
+      }
+      
+      this.exportImportModal.hide();
+      alert('Datos importados correctamente');
     } catch (error) {
-      console.error('Error al leer archivo:', error);
-      alert(`Error al leer el archivo: ${error.message}`);
+      console.error('Error al importar datos:', error);
+      alert('Error al importar los datos: ' + error.message);
     }
   }
-
-  /**
-   * Lee un archivo como texto
-   * @param {File} file - Archivo a leer
-   * @returns {Promise<string>} Contenido del archivo
-   */
-  readFileAsText(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      
-      reader.onload = (e) => {
-        resolve(e.target.result);
-      };
-      
-      reader.onerror = (e) => {
-        reject(new Error('Error al leer el archivo'));
-      };
-      
-      reader.readAsText(file);
-    });
-  }
-}
-
-// Crear instancia de utilidades
-const exportImportUtils = new ExportImportUtils();
+};
