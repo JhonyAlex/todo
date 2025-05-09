@@ -88,17 +88,21 @@ function showAppError(error) {
 // Escuchar mensajes del Service Worker
 if (navigator.serviceWorker) {
   navigator.serviceWorker.addEventListener('message', (event) => {
-    const data = event.data;
-    
-    if (data.type === 'reschedule' && data.reminderId) {
-      // Reprogramar notificación que fue cerrada sin interacción
-      dbService.getReminder(data.reminderId)
-        .then(reminder => {
-          if (reminder && !reminder.completed) {
-            notificationService.rescheduleNotification(reminder);
-          }
-        })
-        .catch(console.error);
+    try {
+      const data = event.data;
+      
+      if (data.type === 'reschedule' && data.reminderId) {
+        // Reprogramar notificación que fue cerrada sin interacción
+        dbService.getReminder(data.reminderId)
+          .then(reminder => {
+            if (reminder && !reminder.completed) {
+              notificationService.rescheduleNotification(reminder);
+            }
+          })
+          .catch(error => console.error('Error al reprogramar recordatorio:', error));
+      }
+    } catch (error) {
+      console.error('Error al procesar mensaje del Service Worker:', error);
     }
   });
 }
