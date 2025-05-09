@@ -16,6 +16,7 @@ class NotificationService {
     // Comprobar si las notificaciones están disponibles
     if (!('Notification' in window)) {
       console.warn('Este navegador no soporta notificaciones de escritorio');
+      this.showBrowserNotificationAlert(false);
       return false;
     }
 
@@ -25,6 +26,7 @@ class NotificationService {
       return true;
     } else if (Notification.permission === 'denied') {
       console.warn('El usuario ha denegado los permisos de notificaciones');
+      this.showBrowserNotificationAlert(true);
       return false;
     }
 
@@ -42,12 +44,56 @@ class NotificationService {
     try {
       const permission = await Notification.requestPermission();
       this.hasPermission = permission === 'granted';
+      
+      if (!this.hasPermission && permission === 'denied') {
+        this.showBrowserNotificationAlert(true);
+      }
+      
       return this.hasPermission;
     } catch (error) {
       console.error('Error al solicitar permisos de notificación:', error);
       return false;
     } finally {
       this.checkingPermissions = false;
+    }
+  }
+
+  /**
+   * Muestra una alerta en la interfaz sobre los permisos de notificaciones
+   * @param {boolean} isDenied - Si el permiso fue denegado explícitamente
+   */
+  showBrowserNotificationAlert(isDenied) {
+    // Crear elemento de alerta
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-warning alert-dismissible fade show notification-alert';
+    alertDiv.setAttribute('role', 'alert');
+    
+    if (isDenied) {
+      alertDiv.innerHTML = `
+        <strong>Notificaciones desactivadas</strong>
+        <p>Has denegado los permisos para mostrar notificaciones. Para recibir recordatorios, activa los permisos en la configuración de tu navegador.</p>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      `;
+    } else {
+      alertDiv.innerHTML = `
+        <strong>Notificaciones no soportadas</strong>
+        <p>Tu navegador no soporta notificaciones. Para obtener la mejor experiencia, utiliza un navegador compatible como Chrome, Firefox o Edge.</p>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      `;
+    }
+    
+    // Añadir al inicio del contenido
+    const container = document.querySelector('.container');
+    if (container) {
+      const firstChild = container.firstChild;
+      container.insertBefore(alertDiv, firstChild);
+    }
+    
+    // Inicializar el botón de cerrar alerta con Bootstrap
+    const closeButton = alertDiv.querySelector('.btn-close');
+    if (closeButton) {
+      const bsAlert = new bootstrap.Alert(alertDiv);
+      closeButton.addEventListener('click', () => bsAlert.close());
     }
   }
 

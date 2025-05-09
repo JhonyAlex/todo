@@ -126,6 +126,22 @@ footer {
     z-index: 1050;
 }
 
+/* Estilos para la alerta de notificaciones */
+.notification-alert {
+    margin-bottom: 20px;
+    border-left: 5px solid #ffc107;
+}
+
+.notification-alert strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Animación para la alerta */
+.notification-alert.fade {
+    transition: opacity 0.5s linear;
+}
+
 /* Animaciones */
 @keyframes fadeIn {
     from { opacity: 0; }
