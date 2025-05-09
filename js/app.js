@@ -12,6 +12,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     reminderList.init();
     tagManager.init();
     exportImportUtils.init();
+    
+    // Configurar escuchadores para accesibilidad
+    setupAccessibilityHandlers();
 
     // Comprobar notificaciones pendientes
     notificationService.checkPendingNotifications();
@@ -26,6 +29,48 @@ document.addEventListener('DOMContentLoaded', async () => {
     showAppError(error);
   }
 });
+
+/**
+ * Configura manejadores de eventos para mejorar la accesibilidad
+ */
+function setupAccessibilityHandlers() {
+  // Manejar tecla Escape para cerrar modales
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      // Comprobar si hay algún modal abierto y cerrarlo
+      const openModals = document.querySelectorAll('.modal.show');
+      if (openModals.length > 0) {
+        const modalId = openModals[0].id;
+        const modalInstance = bootstrap.Modal.getInstance(document.getElementById(modalId));
+        if (modalInstance) {
+          modalInstance.hide();
+        }
+      }
+    }
+  });
+  
+  // Asegurarse de que los modales no bloquean la accesibilidad por teclado
+  const modals = document.querySelectorAll('.modal');
+  modals.forEach(modal => {
+    modal.addEventListener('shown.bs.modal', () => {
+      // Asegurarse de que el modal es el único contenedor interactivo
+      document.querySelectorAll('body > *:not(.modal):not(.modal-backdrop)').forEach(el => {
+        if (!el.hasAttribute('aria-hidden')) {
+          el.setAttribute('aria-hidden', 'true');
+        }
+      });
+    });
+    
+    modal.addEventListener('hidden.bs.modal', () => {
+      // Restaurar la accesibilidad de los demás elementos
+      document.querySelectorAll('body > *[aria-hidden="true"]').forEach(el => {
+        if (el.classList && !el.classList.contains('modal') && !el.classList.contains('modal-backdrop')) {
+          el.removeAttribute('aria-hidden');
+        }
+      });
+    });
+  });
+}
 
 /**
  * Maneja parámetros de URL para acciones desde notificaciones

@@ -30,7 +30,7 @@ class ReminderList {
     this.navAll.addEventListener('click', () => this.setView('all'));
     this.navToday.addEventListener('click', () => this.setView('today'));
     this.navUpcoming.addEventListener('click', () => this.setView('upcoming'));
-    this.newReminderBtn.addEventListener('click', () => reminderEditor.openNew());
+    this.newReminderBtn.addEventListener('click', (e) => reminderEditor.openNew(e.currentTarget));
     this.confirmDeleteBtn.addEventListener('click', this.confirmDelete.bind(this));
     
     // Escuchar eventos de la aplicación
@@ -236,7 +236,7 @@ class ReminderList {
       }
       
       // Abrir en modo de edición pero deshabilitando campos
-      reminderEditor.openEdit(reminder);
+      reminderEditor.openEdit(reminder, document.activeElement);
       // TODO: Implementar una vista de solo lectura
     } catch (error) {
       console.error('Error al cargar recordatorio:', error);
@@ -254,7 +254,7 @@ class ReminderList {
         throw new Error('Recordatorio no encontrado');
       }
       
-      reminderEditor.openEdit(reminder);
+      reminderEditor.openEdit(reminder, document.activeElement);
     } catch (error) {
       console.error('Error al cargar recordatorio para editar:', error);
     }

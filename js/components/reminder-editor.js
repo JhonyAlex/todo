@@ -7,6 +7,7 @@ class ReminderEditor {
     this.currentReminderId = null;
     this.modal = null;
     this.tags = [];
+    this.triggerElement = null; // Elemento que abrió el modal
   }
 
   /**
@@ -30,7 +31,9 @@ class ReminderEditor {
     });
 
     // Referencias DOM
-    this.modal = new bootstrap.Modal(document.getElementById('reminderModal'));
+    const modalElement = document.getElementById('reminderModal');
+    this.modalElement = modalElement;
+    this.modal = new bootstrap.Modal(modalElement);
     this.reminderForm = document.getElementById('reminder-form');
     this.saveButton = document.getElementById('save-reminder');
     this.titleInput = document.getElementById('reminder-title');
@@ -40,6 +43,8 @@ class ReminderEditor {
     this.tagSelection = document.getElementById('tag-selection');
     this.newTagInput = document.getElementById('new-tag-input');
     this.addTagButton = document.getElementById('add-tag-btn');
+    this.closeButton = modalElement.querySelector('.btn-close');
+    this.cancelButton = modalElement.querySelector('.btn-secondary');
 
     // Eventos
     this.saveButton.addEventListener('click', this.handleSave.bind(this));
@@ -51,14 +56,30 @@ class ReminderEditor {
       }
     });
     
+    // Manejar el foco correctamente cuando el modal se muestra/oculta para mejorar accesibilidad
+    modalElement.addEventListener('shown.bs.modal', () => {
+      // Darle foco al primer campo al abrir el modal
+      this.titleInput.focus();
+    });
+
+    modalElement.addEventListener('hidden.bs.modal', () => {
+      // Devolver el foco al elemento que abrió el modal cuando se cierra
+      if (this.triggerElement && this.triggerElement.focus) {
+        this.triggerElement.focus();
+      }
+      this.triggerElement = null;
+    });
+    
     // Usar la primera línea como título
     this.quill.on('text-change', this.handleTextChange.bind(this));
   }
 
   /**
    * Abre el editor para crear un nuevo recordatorio
+   * @param {HTMLElement} [triggerElement] - Elemento que abrió el modal
    */
-  openNew() {
+  openNew(triggerElement) {
+    this.triggerElement = triggerElement || document.activeElement;
     this.currentReminderId = null;
     document.getElementById('modal-title').textContent = 'Nuevo recordatorio';
     
@@ -88,8 +109,11 @@ class ReminderEditor {
   /**
    * Abre el editor para editar un recordatorio existente
    * @param {Object} reminder - Recordatorio a editar
+   * @param {HTMLElement} [triggerElement] - Elemento que abrió el modal
    */
-  async openEdit(reminder) {
+  async openEdit(reminder, triggerElement) {
+    this.triggerElement = triggerElement || document.activeElement;
+    
     try {
       this.currentReminderId = reminder.id;
       document.getElementById('modal-title').textContent = 'Editar recordatorio';
