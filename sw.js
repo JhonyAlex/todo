@@ -1,6 +1,6 @@
 // Service Worker para gestionar notificaciones
 
-const CACHE_NAME = 'todo-cache-v1';
+const CACHE_NAME = 'todo-cache-v2'; // Updated cache version
 const urlsToCache = [
   './',
   './index.html',
@@ -17,8 +17,7 @@ const urlsToCache = [
   './js/app.js',
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
   'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css',
-  'https://cdn.quilljs.com/1.3.6/quill.snow.css',
-  'https://cdn.quilljs.com/1.3.6/quill.min.js',
+  'https://cdn.tiny.cloud/1/kwdd2a5zlx9q50f5f9ajwrqyrbls42q47p54m6jbj2ui6oa9/tinymce/6/tinymce.min.js',
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js'
 ];
 

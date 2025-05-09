@@ -3,31 +3,41 @@
  */
 class ReminderEditor {
   constructor() {
-    this.quill = null;
+    this.editor = null;
     this.currentReminderId = null;
     this.modal = null;
     this.tags = [];
-    this.triggerElement = null; // Elemento que abrió el modal
+    this.triggerElement = null;
   }
 
   /**
    * Inicializa el editor
    */
   init() {
-    // Inicializar el editor Quill
-    this.quill = new Quill('#editor-container', {
-      modules: {
-        toolbar: [
-          [{ 'header': [1, 2, 3, false] }],
-          ['bold', 'italic', 'underline', 'strike'],
-          [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-          [{ 'color': [] }, { 'background': [] }],
-          ['image', 'link'],
-          ['clean']
-        ]
-      },
-      placeholder: '¿Qué necesitas recordar?',
-      theme: 'snow'
+    // Inicializar el editor TinyMCE
+    tinymce.init({
+      selector: '#editor-container',
+      height: 300,
+      menubar: false,
+      plugins: [
+        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+        'insertdatetime', 'media', 'table', 'help', 'wordcount'
+      ],
+      toolbar: 'undo redo | formatselect | ' +
+        'bold italic backcolor | alignleft aligncenter ' +
+        'alignright alignjustify | bullist numlist outdent indent | ' +
+        'removeformat | help',
+      content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; }',
+      setup: (editor) => {
+        // Guardar referencia al editor
+        this.editor = editor;
+        
+        // Detectar cambios en el contenido
+        editor.on('keyup', () => {
+          this.handleTextChange();
+        });
+      }
     });
 
     // Referencias DOM
@@ -43,8 +53,6 @@ class ReminderEditor {
     this.tagSelection = document.getElementById('tag-selection');
     this.newTagInput = document.getElementById('new-tag-input');
     this.addTagButton = document.getElementById('add-tag-btn');
-    this.closeButton = modalElement.querySelector('.btn-close');
-    this.cancelButton = modalElement.querySelector('.btn-secondary');
 
     // Eventos
     this.saveButton.addEventListener('click', this.handleSave.bind(this));
@@ -56,22 +64,19 @@ class ReminderEditor {
       }
     });
     
-    // Manejar el foco correctamente cuando el modal se muestra/oculta para mejorar accesibilidad
+    // Manejar el foco correctamente cuando el modal se muestra/oculta
     modalElement.addEventListener('shown.bs.modal', () => {
       // Darle foco al primer campo al abrir el modal
       this.titleInput.focus();
     });
 
     modalElement.addEventListener('hidden.bs.modal', () => {
-      // Devolver el foco al elemento que abrió el modal cuando se cierra
+      // Devolver el foco al elemento que abrió el modal
       if (this.triggerElement && this.triggerElement.focus) {
         this.triggerElement.focus();
       }
       this.triggerElement = null;
     });
-    
-    // Usar la primera línea como título
-    this.quill.on('text-change', this.handleTextChange.bind(this));
   }
 
   /**
@@ -85,7 +90,11 @@ class ReminderEditor {
     
     // Limpiar formulario
     this.reminderForm.reset();
-    this.quill.root.innerHTML = '';
+    
+    // Limpiar el contenido del editor
+    if (this.editor) {
+      this.editor.setContent('');
+    }
     
     // Establecer fecha y hora predeterminadas (hoy, hora actual + 1)
     const now = new Date();
@@ -133,7 +142,9 @@ class ReminderEditor {
       this.timeInput.value = timeStr;
       
       // Cargar contenido al editor
-      this.quill.root.innerHTML = reminder.description || '';
+      if (this.editor) {
+        this.editor.setContent(reminder.description || '');
+      }
       
       // Cargar etiquetas
       await this.loadTags(reminder.tags || []);
@@ -183,13 +194,15 @@ class ReminderEditor {
   /**
    * Maneja el evento de texto cambiado en el editor
    */
-  handleTextChange(delta, oldContents, source) {
-    if (source !== 'user') return;
-    
+  handleTextChange() {
     try {
+      if (!this.editor) return;
+      
+      // Obtener el contenido como texto plano
+      const content = this.editor.getContent({ format: 'text' });
+      
       // Obtener la primera línea del texto
-      const text = this.quill.getText();
-      const firstLine = text.split('\n')[0].trim();
+      const firstLine = content.split('\n')[0].trim();
       
       // Si hay contenido en la primera línea y el título está vacío, usarlo como título
       if (firstLine && !this.titleInput.value) {
@@ -213,7 +226,7 @@ class ReminderEditor {
       
       // Construir objeto de recordatorio
       const title = this.titleInput.value.trim();
-      const description = this.quill.root.innerHTML;
+      const description = this.editor ? this.editor.getContent() : '';
       const date = this.dateInput.value;
       const time = this.timeInput.value;
       const assignee = this.assigneeInput.value.trim();
