@@ -1394,7 +1394,7 @@ class ReminderList {
     if (reminder.completed) borderColorClass = 'border-l-4 border-green-500 dark:border-green-400 opacity-70 dark:opacity-60';
     else if (isOverdue) borderColorClass = 'border-l-4 border-red-500 dark:border-red-400';
     else if (isToday) borderColorClass = 'border-l-4 border-yellow-500 dark:border-yellow-400';
-    card.classList.add(borderColorClass);
+     card.classList.add(...borderColorClasses);
 
     const reminderDate = new Date(reminder.date);
     const formattedDate = DateUtils.formatDate(reminderDate, true);
