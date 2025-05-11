@@ -1039,8 +1039,8 @@ class ReminderEditor {
         this.editor = editor;
         editor.on('init', () => { // Set content after init
             if (this.initialContent) editor.setContent(this.initialContent);
-            if (this.isReadOnly) editor.setMode('readonly');
-            else editor.setMode('design');
+            if (this.isReadOnly) editor.mode.set('readonly'); // <--- CAMBIADA
+            else editor.mode.set('design'); // <--- CAMBIADA
         });
         editor.on('focus', () => {
             editor.editorContainer.classList.add('ring-2', 'ring-blue-500');
@@ -1112,7 +1112,7 @@ class ReminderEditor {
     this.viewCloseButton.textContent = isEditable ? 'Cancelar' : 'Cerrar';
 
     if (this.editor) {
-        this.editor.setMode(isEditable ? 'design' : 'readonly');
+        this.editor.mode.set(isEditable ? 'design' : 'readonly'); // <--- CAMBIADA
     }
     
     // Disable tag selection clicks if not editable
