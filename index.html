@@ -1387,14 +1387,21 @@ class ReminderList {
     card.className = `bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden transition-all duration-200 ease-in-out hover:shadow-xl relative`;
     card.setAttribute('data-id', reminder.id);
 
-    let borderColorClass = 'border-l-4 border-blue-500 dark:border-blue-400'; // Default
+    let borderColorClasses = ['border-l-4', 'border-blue-500', 'dark:border-blue-400']; 
+
     const isOverdue = !reminder.completed && DateUtils.isOverdue(reminder.date);
     const isToday = !reminder.completed && DateUtils.isToday(reminder.date) && !isOverdue;
 
-    if (reminder.completed) borderColorClass = 'border-l-4 border-green-500 dark:border-green-400 opacity-70 dark:opacity-60';
-    else if (isOverdue) borderColorClass = 'border-l-4 border-red-500 dark:border-red-400';
-    else if (isToday) borderColorClass = 'border-l-4 border-yellow-500 dark:border-yellow-400';
-     card.classList.add(...borderColorClasses);
+    if (reminder.completed) {
+        borderColorClasses = ['border-l-4', 'border-green-500', 'dark:border-green-400', 'opacity-70', 'dark:opacity-60'];
+    } else if (isOverdue) {
+        borderColorClasses = ['border-l-4', 'border-red-500', 'dark:border-red-400'];
+    } else if (isToday) {
+        borderColorClasses = ['border-l-4', 'border-yellow-500', 'dark:border-yellow-400'];
+    }
+    // Now, even if it's an upcoming (but not today) reminder, it will use the default blue border classes.
+    
+    card.classList.add(...borderColorClasses); // Esta línea ahora es segura.
 
     const reminderDate = new Date(reminder.date);
     const formattedDate = DateUtils.formatDate(reminderDate, true);
