@@ -3,209 +3,1979 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recordatorios App</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="assets/css/styles.css" rel="stylesheet">
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/png" href="assets/img/favicon.png">
+    <title>Recordatorios App Modernizada</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <script src="https://cdn.tiny.cloud/1/kwdd2a5zlx9q50f5f9ajwrqyrbls42q47p54m6jbj2ui6oa9/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for webkit browsers */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        /* Dark mode scrollbar */
+        .dark .custom-scrollbar::-webkit-scrollbar-track {
+            background: #2d3748; /* dark:bg-gray-700 */
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #4a5568; /* dark:bg-gray-500 */
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #718096; /* dark:bg-gray-400 */
+        }
+
+        /* TinyMCE dark mode adjustments */
+        .dark .tox .tox-edit-area__iframe {
+            background-color: #1a202c !important; /* Corresponde a gray-900 o un gris oscuro */
+        }
+        .dark .tox .tox-edit-area__iframe body {
+            color: #e2e8f0 !important; /* Corresponde a gray-200 o un color de texto claro */
+        }
+        .dark .tox .tox-toolbar, .dark .tox .tox-toolbar__primary, .dark .tox .tox-toolbar__overflow {
+            background-color: #2d3748 !important; /* gray-800 */
+        }
+        .dark .tox .tox-tbtn, .dark .tox .tox-tbtn svg {
+            color: #e2e8f0 !important;
+            fill: #e2e8f0 !important;
+        }
+        .dark .tox .tox-tbtn--enabled, .dark .tox .tox-tbtn--enabled:hover {
+             background-color: #4a5568 !important; /* gray-600 */
+        }
+        .dark .tox .tox-mbtn {
+            color: #e2e8f0 !important;
+        }
+         /* Ensure modal backdrop is slightly darker in dark mode for better contrast */
+        .dark .modal-backdrop-custom {
+            background-color: rgba(0, 0, 0, 0.75);
+        }
+        .modal-backdrop-custom {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+    </style>
+    <script>
+        // Tailwind Dark Mode Configuration
+        tailwind.config = {
+            darkMode: 'class', // or 'media'
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="https://placehold.co/32x32/3498db/ffffff?text=RA">
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">
-                <img src="assets/img/logo.png" alt="Logo" width="30" height="30" class="d-inline-block align-text-top me-2">
-                Recordatorios App
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#" id="nav-all">Todos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="nav-today">Hoy</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="nav-upcoming">Próximos</a>
-                    </li>
-                </ul>
-                <div class="d-flex">
-                    <button class="btn btn-light me-2" id="btn-export" title="Exportar datos">
-                        <i class="bi bi-download"></i>
-                    </button>
-                    <button class="btn btn-light me-2" id="btn-import" title="Importar datos">
-                        <i class="bi bi-upload"></i>
-                    </button>
-                    <input type="file" id="import-file" accept=".json" hidden>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col transition-colors duration-300">
+
+    <nav class="bg-blue-600 dark:bg-blue-700 shadow-md">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a class="flex-shrink-0 flex items-center text-white" href="#">
+                        <img src="https://placehold.co/30x30/ffffff/3498db?text=RA" alt="Logo" class="h-8 w-8 mr-2">
+                        <span class="font-semibold text-xl">Recordatorios App</span>
+                    </a>
                 </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#" id="nav-all" class="nav-link text-white hover:bg-blue-500 dark:hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium active">Todos</a>
+                        <a href="#" id="nav-today" class="nav-link text-white hover:bg-blue-500 dark:hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium">Hoy</a>
+                        <a href="#" id="nav-upcoming" class="nav-link text-white hover:bg-blue-500 dark:hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium">Próximos</a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <button id="btn-export" title="Exportar datos" class="text-white hover:bg-blue-500 dark:hover:bg-blue-600 p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-blue-700 focus:ring-white">
+                        <i class="bi bi-download text-xl"></i>
+                    </button>
+                    <button id="btn-import" title="Importar datos" class="ml-2 text-white hover:bg-blue-500 dark:hover:bg-blue-600 p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-blue-700 focus:ring-white">
+                        <i class="bi bi-upload text-xl"></i>
+                    </button>
+                    <input type="file" id="import-file" accept=".json" class="hidden">
+                    <button id="theme-toggle" title="Alternar Tema" class="ml-3 text-white hover:bg-blue-500 dark:hover:bg-blue-600 p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-blue-700 focus:ring-white">
+                        <i class="bi"></i> </button>
+                </div>
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" id="mobile-menu-button" class="bg-blue-600 dark:bg-blue-700 inline-flex items-center justify-center p-2 rounded-md text-blue-200 hover:text-white hover:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Abrir menú principal</span>
+                        <i class="bi bi-list text-2xl block"></i>
+                        <i class="bi bi-x text-2xl hidden"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#" id="nav-all-mobile" class="nav-link-mobile text-blue-100 hover:bg-blue-500 dark:hover:bg-blue-600 hover:text-white block px-3 py-2 rounded-md text-base font-medium active">Todos</a>
+                <a href="#" id="nav-today-mobile" class="nav-link-mobile text-blue-100 hover:bg-blue-500 dark:hover:bg-blue-600 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Hoy</a>
+                <a href="#" id="nav-upcoming-mobile" class="nav-link-mobile text-blue-100 hover:bg-blue-500 dark:hover:bg-blue-600 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Próximos</a>
             </div>
         </div>
     </nav>
 
-    <div class="container mt-4">
-        <div class="row">
-            <!-- Filtros y etiquetas -->
-            <div class="col-lg-3 mb-4">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Etiquetas</h5>
-                        <button class="btn btn-sm btn-outline-primary" id="btn-add-tag">
-                            <i class="bi bi-plus"></i>
+    <div id="notification-alert-container" class="container mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+        </div>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 mt-4 flex-grow">
+        <div class="flex flex-col lg:flex-row gap-6">
+            <div class="w-full lg:w-1/4">
+                <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+                    <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                        <h5 class="text-lg font-semibold">Etiquetas</h5>
+                        <button class="btn-primary-outline text-sm p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700" id="btn-add-tag">
+                            <i class="bi bi-plus-lg"></i> <span class="hidden sm:inline">Nueva</span>
                         </button>
                     </div>
-                    <div class="card-body p-0">
-                        <ul class="list-group list-group-flush" id="tag-list">
-                            <!-- Tags will be loaded here -->
-                        </ul>
+                    <div class="p-0">
+                        <ul class="list-none p-0" id="tag-list">
+                            </ul>
                     </div>
                 </div>
             </div>
 
-            <!-- Lista de recordatorios -->
-            <div class="col-lg-9">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h2 id="current-view-title">Todos los recordatorios</h2>
-                    <button class="btn btn-primary" id="btn-new-reminder">
-                        <i class="bi bi-plus"></i> Nuevo recordatorio
+            <div class="w-full lg:w-3/4">
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-2">
+                    <h2 id="current-view-title" class="text-2xl font-semibold">Todos los recordatorios</h2>
+                    <button class="btn-primary w-full sm:w-auto" id="btn-new-reminder">
+                        <i class="bi bi-plus-lg"></i> Nuevo recordatorio
                     </button>
                 </div>
 
-                <!-- Barra de búsqueda -->
-                <div class="input-group mb-3">
-                    <span class="input-group-text">
-                        <i class="bi bi-search"></i>
-                    </span>
-                    <input type="text" class="form-control" id="search-input" placeholder="Buscar recordatorios...">
+                <div class="relative mb-4">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="bi bi-search text-gray-400"></i>
+                    </div>
+                    <input type="text" class="form-input w-full pl-10 pr-4 py-2 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" id="search-input" placeholder="Buscar recordatorios...">
                 </div>
 
-                <!-- Lista de recordatorios -->
-                <div id="reminders-list" class="reminders-container">
-                    <!-- Reminders will be loaded here -->
+                <div id="reminders-list" class="space-y-4 custom-scrollbar" style="max-height: calc(100vh - 280px); overflow-y: auto; padding-right: 8px;">
+                    </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="reminderModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div id="reminderModalBackdrop" class="fixed inset-0 bg-gray-500 bg-opacity-75 dark:bg-opacity-75 modal-backdrop-custom transition-opacity"></div>
+        <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl transform transition-all sm:my-8 sm:max-w-2xl w-full overflow-y-auto max-h-[90vh]">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between">
+                    <h5 class="text-xl font-semibold" id="modal-title">Nuevo recordatorio</h5>
+                    <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" data-dismiss-modal="reminderModal">
+                        <span class="sr-only">Cerrar</span>
+                        <i class="bi bi-x-lg text-2xl"></i>
+                    </button>
                 </div>
+            </div>
+            <div class="p-6 custom-scrollbar" style="max-height: calc(90vh - 120px); overflow-y: auto;">
+                <form id="reminder-form" class="space-y-4">
+                    <input type="hidden" id="reminder-id">
+                    <div>
+                        <label for="reminder-title" class="form-label">Título</label>
+                        <input type="text" class="form-input mt-1 w-full" id="reminder-title" required>
+                    </div>
+                    <div>
+                        <label for="reminder-assignee" class="form-label">Destinatario (Opcional)</label>
+                        <input type="text" class="form-input mt-1 w-full" id="reminder-assignee" placeholder="¿Para quién es esta tarea?">
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="reminder-date" class="form-label">Fecha</label>
+                            <input type="date" class="form-input mt-1 w-full" id="reminder-date" required>
+                        </div>
+                        <div>
+                            <label for="reminder-time" class="form-label">Hora</label>
+                            <input type="time" class="form-input mt-1 w-full" id="reminder-time" required>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="editor-container" class="form-label">Descripción</label>
+                        <textarea id="editor-container" class="form-textarea mt-1 w-full rounded-md" style="height: 200px;"></textarea>
+                    </div>
+                    <div>
+                        <label class="form-label">Etiquetas</label>
+                        <div class="mt-1 flex flex-wrap gap-2" id="tag-selection">
+                            </div>
+                        <div class="mt-3 flex gap-2">
+                            <input type="text" class="form-input flex-grow" id="new-tag-input" placeholder="Nueva etiqueta">
+                            <button class="btn-secondary-outline whitespace-nowrap" type="button" id="add-tag-btn">Agregar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 flex flex-col sm:flex-row-reverse gap-2">
+                <button type="button" class="btn-primary w-full sm:w-auto" id="save-reminder">Guardar</button>
+                <button type="button" class="btn-secondary w-full sm:w-auto" id="view-close-reminder" data-dismiss-modal="reminderModal">Cerrar</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal para crear/editar recordatorio -->
-    <div class="modal fade" id="reminderModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modal-title">Nuevo recordatorio</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="reminder-form">
-                        <input type="hidden" id="reminder-id">
-                        <div class="mb-3">
-                            <label for="reminder-title" class="form-label">Título</label>
-                            <input type="text" class="form-control" id="reminder-title" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="reminder-assignee" class="form-label">Destinatario</label>
-                            <input type="text" class="form-control" id="reminder-assignee" placeholder="¿Para quién es esta tarea?">
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="reminder-date" class="form-label">Fecha</label>
-                                <input type="date" class="form-control" id="reminder-date" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="reminder-time" class="form-label">Hora</label>
-                                <input type="time" class="form-control" id="reminder-time" required>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editor-container" class="form-label">Descripción</label>
-                            <textarea id="editor-container" class="form-control" style="height: 200px;"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Etiquetas</label>
-                            <div class="d-flex flex-wrap gap-2" id="tag-selection">
-                                <!-- Tags will be loaded here for selection -->
-                            </div>
-                            <div class="input-group mt-2">
-                                <input type="text" class="form-control" id="new-tag-input" placeholder="Nueva etiqueta">
-                                <button class="btn btn-outline-secondary" type="button" id="add-tag-btn">Agregar</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" id="save-reminder">Guardar</button>
-                </div>
+    <div id="deleteModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" aria-labelledby="delete-modal-title" role="dialog" aria-modal="true">
+        <div id="deleteModalBackdrop" class="fixed inset-0 bg-gray-500 bg-opacity-75 dark:bg-opacity-75 modal-backdrop-custom transition-opacity"></div>
+        <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl transform transition-all sm:my-8 sm:max-w-lg w-full">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                 <h5 class="text-xl font-semibold" id="delete-modal-title">Confirmar eliminación</h5>
+            </div>
+            <div class="p-6">
+                <p>¿Estás seguro de que deseas eliminar este recordatorio? Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 flex flex-col sm:flex-row-reverse gap-2">
+                <button type="button" class="btn-danger w-full sm:w-auto" id="confirm-delete">Eliminar</button>
+                <button type="button" class="btn-secondary w-full sm:w-auto" data-dismiss-modal="deleteModal">Cancelar</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal de confirmación para eliminar -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Confirmar eliminación</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div id="exportImportModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" aria-labelledby="exportImport-modal-title" role="dialog" aria-modal="true">
+        <div id="exportImportModalBackdrop" class="fixed inset-0 bg-gray-500 bg-opacity-75 dark:bg-opacity-75 modal-backdrop-custom transition-opacity"></div>
+        <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl transform transition-all sm:my-8 sm:max-w-lg w-full">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                 <h5 class="text-xl font-semibold" id="exportImportTitle">Exportar datos</h5>
+            </div>
+            <div class="p-6" id="exportImportBody">
                 </div>
-                <div class="modal-body">
-                    <p>¿Estás seguro de que deseas eliminar este recordatorio? Esta acción no se puede deshacer.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-danger" id="confirm-delete">Eliminar</button>
-                </div>
+            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 flex flex-col sm:flex-row-reverse gap-2">
+                <button type="button" class="btn-primary w-full sm:w-auto" id="exportImportAction">Exportar</button>
+                <button type="button" class="btn-secondary w-full sm:w-auto" data-dismiss-modal="exportImportModal">Cerrar</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal para exportar/importar -->
-    <div class="modal fade" id="exportImportModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exportImportTitle">Exportar datos</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" id="exportImportBody">
-                    <!-- Content will be set dynamically -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" id="exportImportAction">Exportar</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <footer class="mt-5 py-3 bg-light text-center">
-        <div class="container">
-            <p class="mb-0">Recordatorios App © 2025</p>
+    <footer class="mt-auto py-6 bg-gray-200 dark:bg-gray-800 text-center text-gray-600 dark:text-gray-400">
+        <div class="container mx-auto">
+            <p class="mb-0">Recordatorios App Modernizada © <span id="currentYear"></span></p>
         </div>
     </footer>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/services/db-service.js"></script>
-    <script src="js/services/notification-service.js"></script>
-    <script src="js/components/reminder-editor.js"></script>
-    <script src="js/components/reminder-list.js"></script>
-    <script src="js/components/tag-manager.js"></script>
-    <script src="js/utils/date-utils.js"></script>
-    <script src="js/utils/export-import.js"></script>
-    <script src="js/app.js"></script>
-    <script>
-        // Registrar Service Worker para las notificaciones en segundo plano
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(registration => console.log('Service Worker registrado correctamente', registration))
-                    .catch(err => console.error('Error al registrar Service Worker', err));
-            });
+    <div id="toast-container" class="fixed bottom-5 right-5 space-y-3 z-[100]">
+        </div>
+
+
+<script>
+// Helper function to apply styles
+function applyStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+        .btn-primary {
+            @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50;
         }
-    </script>
+        .btn-primary-outline {
+            @apply bg-transparent hover:bg-blue-50 dark:hover:bg-gray-700 text-blue-600 dark:text-blue-400 font-semibold py-2 px-4 border border-blue-500 dark:border-blue-400 hover:border-transparent rounded-lg transition duration-150 ease-in-out;
+        }
+        .btn-secondary {
+            @apply bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-100 font-semibold py-2 px-4 rounded-lg shadow-md transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50;
+        }
+        .btn-secondary-outline {
+            @apply bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold py-2 px-4 border border-gray-300 dark:border-gray-500 rounded-lg transition duration-150 ease-in-out;
+        }
+        .btn-danger {
+            @apply bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50;
+        }
+        .form-label {
+            @apply block text-sm font-medium text-gray-700 dark:text-gray-300;
+        }
+        .form-input, .form-textarea, .form-select {
+            @apply mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500;
+        }
+        .nav-link.active, .nav-link-mobile.active {
+            @apply bg-blue-700 dark:bg-blue-800 text-white;
+        }
+        .modal {
+            @apply fixed inset-0 z-50 flex items-center justify-center p-4;
+        }
+        .modal-content {
+             @apply relative bg-white dark:bg-gray-800 rounded-lg shadow-xl transform transition-all sm:my-8 sm:max-w-2xl w-full;
+        }
+    `;
+    document.head.appendChild(style);
+}
+applyStyles();
+
+// Modal Handling
+function Modal(modalId) {
+    const modalElement = document.getElementById(modalId);
+    const backdropElement = document.getElementById(modalId + 'Backdrop');
+
+    function show() {
+        modalElement.classList.remove('hidden');
+        modalElement.classList.add('flex');
+        document.body.classList.add('overflow-hidden'); // Prevent background scrolling
+    }
+
+    function hide() {
+        modalElement.classList.add('hidden');
+        modalElement.classList.remove('flex');
+        document.body.classList.remove('overflow-hidden');
+    }
+
+    // Add event listeners to close buttons
+    modalElement.querySelectorAll('[data-dismiss-modal="' + modalId + '"]').forEach(button => {
+        button.addEventListener('click', hide);
+    });
+    if (backdropElement) {
+         backdropElement.addEventListener('click', hide);
+    }
+
+
+    return { show, hide, element: modalElement };
+}
+
+
+// Initialize Modals
+let reminderModalInstance, deleteModalInstance, exportImportModalInstance;
+
+
+// Theme Toggle
+const themeToggle = document.getElementById('theme-toggle');
+const themeToggleIcon = themeToggle.querySelector('i');
+
+function setInitialTheme() {
+    if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        themeToggleIcon.className = 'bi bi-sun-fill text-xl text-yellow-300';
+    } else {
+        document.documentElement.classList.remove('dark');
+        themeToggleIcon.className = 'bi bi-moon-stars-fill text-xl';
+    }
+}
+
+themeToggle.addEventListener('click', () => {
+    document.documentElement.classList.toggle('dark');
+    if (document.documentElement.classList.contains('dark')) {
+        localStorage.setItem('theme', 'dark');
+        themeToggleIcon.className = 'bi bi-sun-fill text-xl text-yellow-300';
+    } else {
+        localStorage.setItem('theme', 'light');
+        themeToggleIcon.className = 'bi bi-moon-stars-fill text-xl';
+    }
+    // Re-initialize TinyMCE if it exists to adapt to theme change
+    if (typeof tinymce !== 'undefined' && tinymce.get('editor-container')) {
+        tinymce.get('editor-container').remove();
+        reminderEditor.initTinyMCE(); // Ensure reminderEditor has this method
+    }
+});
+
+setInitialTheme(); // Set theme on initial load
+
+// Mobile Menu
+const mobileMenuButton = document.getElementById('mobile-menu-button');
+const mobileMenu = document.getElementById('mobile-menu');
+const mobileMenuOpenIcon = mobileMenuButton.querySelector('.bi-list');
+const mobileMenuCloseIcon = mobileMenuButton.querySelector('.bi-x');
+
+mobileMenuButton.addEventListener('click', () => {
+    mobileMenu.classList.toggle('hidden');
+    mobileMenuOpenIcon.classList.toggle('hidden');
+    mobileMenuOpenIcon.classList.toggle('block');
+    mobileMenuCloseIcon.classList.toggle('hidden');
+    mobileMenuCloseIcon.classList.toggle('block');
+    const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true' || false;
+    mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+});
+
+// Close mobile menu when a nav link is clicked
+document.querySelectorAll('#mobile-menu .nav-link-mobile').forEach(link => {
+    link.addEventListener('click', () => {
+        mobileMenu.classList.add('hidden');
+        mobileMenuOpenIcon.classList.remove('hidden');
+        mobileMenuOpenIcon.classList.add('block');
+        mobileMenuCloseIcon.classList.add('hidden');
+        mobileMenuCloseIcon.classList.remove('block');
+        mobileMenuButton.setAttribute('aria-expanded', 'false');
+    });
+});
+
+
+// Set current year in footer
+document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+
+/**
+ * js/services/db-service.js
+ */
+class DBService {
+  constructor() {
+    this.DB_NAME = 'RemindersAppModern'; // Changed DB name to avoid conflicts with old version
+    this.DB_VERSION = 1;
+    this.db = null;
+
+    this.STORES = {
+      REMINDERS: 'reminders',
+      TAGS: 'tags',
+      SETTINGS: 'settings' // e.g., for theme preference if not using localStorage
+    };
+  }
+
+  async init() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
+
+      request.onerror = (event) => {
+        console.error('Error al abrir la base de datos:', event.target.error);
+        reject(event.target.error);
+      };
+
+      request.onsuccess = (event) => {
+        this.db = event.target.result;
+        console.log('Base de datos abierta correctamente');
+        resolve();
+      };
+
+      request.onupgradeneeded = (event) => {
+        const db = event.target.result;
+        if (!db.objectStoreNames.contains(this.STORES.REMINDERS)) {
+          const store = db.createObjectStore(this.STORES.REMINDERS, { keyPath: 'id', autoIncrement: true });
+          store.createIndex('date', 'date', { unique: false });
+          store.createIndex('completed', 'completed', { unique: false });
+          store.createIndex('title', 'title', { unique: false });
+          store.createIndex('tags', 'tags', { unique: false, multiEntry: true });
+        }
+        if (!db.objectStoreNames.contains(this.STORES.TAGS)) {
+          const store = db.createObjectStore(this.STORES.TAGS, { keyPath: 'id', autoIncrement: true });
+          store.createIndex('name', 'name', { unique: true });
+        }
+        if (!db.objectStoreNames.contains(this.STORES.SETTINGS)) {
+          db.createObjectStore(this.STORES.SETTINGS, { keyPath: 'key' });
+        }
+      };
+    });
+  }
+
+  async getReminders(options = {}) {
+    return new Promise((resolve, reject) => {
+      if (!this.db) return reject(new Error('La base de datos no está inicializada'));
+      const transaction = this.db.transaction(this.STORES.REMINDERS, 'readonly');
+      const store = transaction.objectStore(this.STORES.REMINDERS);
+      const request = store.getAll();
+
+      request.onsuccess = () => {
+        let results = request.result;
+        if (options.completed !== undefined) {
+          results = results.filter(item => item.completed === options.completed);
+        }
+        if (options.tag) {
+          results = results.filter(item => item.tags && item.tags.includes(options.tag));
+        }
+        if (options.date) { // Filter for a specific day
+          const filterDate = new Date(options.date);
+          const startDate = new Date(filterDate.getFullYear(), filterDate.getMonth(), filterDate.getDate(), 0, 0, 0, 0);
+          const endDate = new Date(filterDate.getFullYear(), filterDate.getMonth(), filterDate.getDate(), 23, 59, 59, 999);
+          results = results.filter(item => {
+            const itemDate = new Date(item.date);
+            return itemDate >= startDate && itemDate <= endDate;
+          });
+        }
+         if (options.upcoming) { // New filter for upcoming (not completed, from today onwards)
+            const todayStart = new Date();
+            todayStart.setHours(0,0,0,0);
+            results = results.filter(item => !item.completed && new Date(item.date) >= todayStart);
+        }
+
+        if (options.search) {
+          const searchLower = options.search.toLowerCase();
+          results = results.filter(item =>
+            item.title.toLowerCase().includes(searchLower) ||
+            (item.description && item.description.toLowerCase().includes(searchLower)) || // Check if description exists
+            (item.assignee && item.assignee.toLowerCase().includes(searchLower))
+          );
+        }
+
+        if (options.sortBy) {
+          results.sort((a, b) => {
+            let valA = a[options.sortBy];
+            let valB = b[options.sortBy];
+            if (options.sortBy === 'date') {
+                valA = new Date(valA);
+                valB = new Date(valB);
+            }
+            if (options.sortDir === 'desc') {
+              return valB > valA ? 1 : (valB < valA ? -1 : 0);
+            }
+            return valA > valB ? 1 : (valA < valB ? -1 : 0);
+          });
+        } else {
+          results.sort((a, b) => new Date(a.date) - new Date(b.date)); // Default sort by date ascending
+        }
+        resolve(results);
+      };
+      request.onerror = (event) => reject(event.target.error);
+    });
+  }
+
+  async getReminder(id) {
+    return new Promise((resolve, reject) => {
+      if (!this.db) return reject(new Error('La base de datos no está inicializada'));
+      const transaction = this.db.transaction(this.STORES.REMINDERS, 'readonly');
+      const store = transaction.objectStore(this.STORES.REMINDERS);
+      const request = store.get(Number(id));
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = (event) => reject(event.target.error);
+    });
+  }
+
+  async saveReminder(reminder) {
+    return new Promise((resolve, reject) => {
+      if (!this.db) return reject(new Error('La base de datos no está inicializada'));
+      const transaction = this.db.transaction(this.STORES.REMINDERS, 'readwrite');
+      const store = transaction.objectStore(this.STORES.REMINDERS);
+      const request = reminder.id ? store.put(reminder) : store.add(reminder);
+      request.onsuccess = () => resolve(request.result); // Returns ID
+      request.onerror = (event) => reject(event.target.error);
+    });
+  }
+
+  async deleteReminder(id) {
+    return new Promise((resolve, reject) => {
+      if (!this.db) return reject(new Error('La base de datos no está inicializada'));
+      const transaction = this.db.transaction(this.STORES.REMINDERS, 'readwrite');
+      const store = transaction.objectStore(this.STORES.REMINDERS);
+      const request = store.delete(Number(id));
+      request.onsuccess = () => resolve();
+      request.onerror = (event) => reject(event.target.error);
+    });
+  }
+
+  async getTags() {
+    return new Promise((resolve, reject) => {
+      if (!this.db) return reject(new Error('La base de datos no está inicializada'));
+      const transaction = this.db.transaction(this.STORES.TAGS, 'readonly');
+      const store = transaction.objectStore(this.STORES.TAGS);
+      const request = store.getAll();
+      request.onsuccess = () => resolve(request.result.sort((a,b) => a.name.localeCompare(b.name)));
+      request.onerror = (event) => reject(event.target.error);
+    });
+  }
+
+  async saveTag(tag) {
+    return new Promise((resolve, reject) => {
+      if (!this.db) return reject(new Error('La base de datos no está inicializada'));
+      const transaction = this.db.transaction(this.STORES.TAGS, 'readwrite');
+      const store = transaction.objectStore(this.STORES.TAGS);
+      const index = store.index('name');
+      const nameRequest = index.get(tag.name);
+
+      nameRequest.onsuccess = () => {
+        if (nameRequest.result && (!tag.id || nameRequest.result.id !== tag.id)) {
+          return reject(new Error('Ya existe una etiqueta con este nombre'));
+        }
+        const request = tag.id ? store.put(tag) : store.add(tag);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = (event) => reject(event.target.error);
+      };
+      nameRequest.onerror = (event) => reject(event.target.error);
+    });
+  }
+
+  async deleteTag(id) {
+    return new Promise(async (resolve, reject) => {
+        if (!this.db) return reject(new Error('La base de datos no está inicializada'));
+
+        // First, remove the tag from all reminders
+        const remindersToUpdate = [];
+        const reminders = await this.getReminders();
+        reminders.forEach(reminder => {
+            if (reminder.tags && reminder.tags.includes(id)) {
+                reminder.tags = reminder.tags.filter(tagId => tagId !== id);
+                remindersToUpdate.push(this.saveReminder(reminder));
+            }
+        });
+        await Promise.all(remindersToUpdate);
+
+        // Then, delete the tag itself
+        const transaction = this.db.transaction(this.STORES.TAGS, 'readwrite');
+        const store = transaction.objectStore(this.STORES.TAGS);
+        const request = store.delete(Number(id));
+        request.onsuccess = () => resolve();
+        request.onerror = (event) => reject(event.target.error);
+    });
+  }
+
+
+  async exportData() {
+    const reminders = await this.getReminders();
+    const tags = await this.getTags();
+    return {
+      reminders,
+      tags,
+      exportDate: new Date().toISOString(),
+      version: this.DB_VERSION
+    };
+  }
+
+  async importData(data) {
+    if (!data || !data.reminders || !data.tags) {
+      throw new Error('Los datos a importar no son válidos');
+    }
+    await this.clearAllData(); // Clear existing data first
+    const tagPromises = data.tags.map(tag => {
+        // Remove ID to ensure new IDs are generated if there are conflicts or to handle data from different systems
+        const { id, ...tagWithoutId } = tag;
+        return this.saveTag(tagWithoutId).catch(e => console.warn(`Skipping tag import due to error: ${e.message}`, tag));
+    });
+    await Promise.all(tagPromises);
+
+    // After tags are potentially re-inserted (and thus might have new IDs),
+    // we need a map from old tag names (or IDs if names aren't unique, though they should be) to new tag IDs.
+    // For simplicity, assuming tag names are unique identifiers for re-mapping.
+    const newTags = await this.getTags();
+    const tagMap = new Map();
+    data.tags.forEach(oldTag => {
+        const newTag = newTags.find(nt => nt.name === oldTag.name);
+        if (newTag) {
+            tagMap.set(oldTag.id, newTag.id); // Map old ID to new ID
+        }
+    });
+
+    const reminderPromises = data.reminders.map(reminder => {
+        const { id, ...reminderWithoutId } = reminder;
+        // Re-map tag IDs
+        if (reminderWithoutId.tags && Array.isArray(reminderWithoutId.tags)) {
+            reminderWithoutId.tags = reminderWithoutId.tags
+                .map(oldTagId => tagMap.get(oldTagId))
+                .filter(newTagId => newTagId !== undefined); // Filter out tags that couldn't be mapped
+        }
+        return this.saveReminder(reminderWithoutId).catch(e => console.warn(`Skipping reminder import due to error: ${e.message}`, reminder));
+    });
+    await Promise.all(reminderPromises);
+    return true;
+  }
+
+
+  async clearAllData() {
+    return new Promise((resolve, reject) => {
+      if (!this.db) return reject(new Error('La base de datos no está inicializada'));
+      const transaction = this.db.transaction([this.STORES.REMINDERS, this.STORES.TAGS], 'readwrite');
+      transaction.objectStore(this.STORES.REMINDERS).clear();
+      transaction.objectStore(this.STORES.TAGS).clear();
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = (event) => reject(event.target.error);
+    });
+  }
+
+  async getPendingReminders() {
+    return new Promise((resolve, reject) => {
+      if (!this.db) return reject(new Error('La base de datos no está inicializada'));
+      const transaction = this.db.transaction(this.STORES.REMINDERS, 'readonly');
+      const store = transaction.objectStore(this.STORES.REMINDERS);
+      const request = store.getAll();
+      request.onsuccess = () => {
+        const now = new Date();
+        const pending = request.result.filter(r => !r.completed && new Date(r.date) <= now);
+        resolve(pending);
+      };
+      request.onerror = (event) => reject(event.target.error);
+    });
+  }
+}
+const dbService = new DBService();
+
+/**
+ * js/services/notification-service.js
+ */
+class NotificationService {
+  constructor() {
+    this.hasPermission = false;
+    this.checkingPermissions = false;
+    this.timers = {}; // Store setTimeout IDs
+  }
+
+  async init() {
+    if (!('Notification' in window)) {
+      console.warn('Este navegador no soporta notificaciones de escritorio.');
+      this.showToast('warning', 'Notificaciones no soportadas', 'Tu navegador no soporta notificaciones. Considera usar Chrome, Firefox, o Edge.');
+      return false;
+    }
+    if (Notification.permission === 'granted') {
+      this.hasPermission = true;
+      return true;
+    }
+    if (Notification.permission === 'denied') {
+      console.warn('El usuario ha denegado los permisos de notificaciones.');
+      this.showToast('warning', 'Notificaciones desactivadas', 'Has denegado los permisos para notificaciones. Actívalos en la configuración de tu navegador para recibir recordatorios.');
+      return false;
+    }
+    return this.requestPermission();
+  }
+
+  async requestPermission() {
+    if (this.checkingPermissions) return false;
+    this.checkingPermissions = true;
+    try {
+      const permission = await Notification.requestPermission();
+      this.hasPermission = permission === 'granted';
+      if (this.hasPermission) {
+        this.showToast('success', 'Permiso concedido', '¡Ahora recibirás notificaciones!');
+      } else if (permission === 'denied') {
+        this.showToast('error', 'Permiso denegado', 'No se podrán mostrar notificaciones. Puedes cambiar esto en la configuración del navegador.');
+      }
+      return this.hasPermission;
+    } catch (error) {
+      console.error('Error al solicitar permisos de notificación:', error);
+      this.showToast('error', 'Error de permisos', 'Ocurrió un error al solicitar permisos de notificación.');
+      return false;
+    } finally {
+      this.checkingPermissions = false;
+    }
+  }
+
+  // Replaced showBrowserNotificationAlert with a more generic toast system
+  showToast(type, title, message, duration = 5000) {
+    const toastContainer = document.getElementById('toast-container');
+    if (!toastContainer) return;
+
+    const toastId = 'toast-' + Date.now();
+    const toast = document.createElement('div');
+    toast.id = toastId;
+    toast.className = `p-4 rounded-lg shadow-lg w-full max-w-sm transition-all duration-300 ease-in-out transform translate-x-full opacity-0 ${
+        type === 'success' ? 'bg-green-500 dark:bg-green-600' :
+        type === 'error' ? 'bg-red-500 dark:bg-red-600' :
+        type === 'warning' ? 'bg-yellow-500 dark:bg-yellow-600' :
+        'bg-blue-500 dark:bg-blue-600'
+    } text-white`;
+
+    toast.innerHTML = `
+        <div class="flex items-start">
+            <div class="flex-shrink-0 pt-0.5">
+                ${type === 'success' ? '<i class="bi bi-check-circle-fill"></i>' : ''}
+                ${type === 'error' ? '<i class="bi bi-x-octagon-fill"></i>' : ''}
+                ${type === 'warning' ? '<i class="bi bi-exclamation-triangle-fill"></i>' : ''}
+                ${type !== 'success' && type !== 'error' && type !== 'warning' ? '<i class="bi bi-info-circle-fill"></i>' : ''}
+            </div>
+            <div class="ml-3 w-0 flex-1">
+                <p class="text-sm font-medium">${title}</p>
+                <p class="mt-1 text-sm">${message}</p>
+            </div>
+            <div class="ml-4 flex-shrink-0 flex">
+                <button class="inline-flex rounded-md text-white hover:text-gray-200 focus:outline-none" onclick="document.getElementById('${toastId}').remove()">
+                    <span class="sr-only">Cerrar</span>
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+        </div>
+    `;
+    toastContainer.appendChild(toast);
+
+    // Animate in
+    setTimeout(() => {
+        toast.classList.remove('translate-x-full', 'opacity-0');
+        toast.classList.add('translate-x-0', 'opacity-100');
+    }, 100);
+
+    // Auto dismiss
+    if (duration) {
+        setTimeout(() => {
+            toast.classList.remove('translate-x-0', 'opacity-100');
+            toast.classList.add('opacity-0'); // Fade out
+            setTimeout(() => toast.remove(), 300); // Remove after fade
+        }, duration);
+    }
+  }
+
+
+  scheduleNotification(reminder) {
+    if (!this.hasPermission || reminder.completed) return;
+    if (this.timers[reminder.id]) clearTimeout(this.timers[reminder.id]);
+
+    const now = new Date();
+    const reminderTime = new Date(reminder.date);
+
+    if (reminderTime <= now) {
+      this.showNotification(reminder);
+      return;
+    }
+    const timeToNotification = reminderTime.getTime() - now.getTime();
+    this.timers[reminder.id] = setTimeout(() => this.showNotification(reminder), timeToNotification);
+    console.log(`Notificación programada para "${reminder.title}" en ${Math.round(timeToNotification / 1000)}s`);
+  }
+
+  rescheduleNotification(reminder) { // For snoozing
+    if (!this.hasPermission || reminder.completed) return;
+    if (this.timers[reminder.id]) clearTimeout(this.timers[reminder.id]);
+
+    const fiveMinutes = 5 * 60 * 1000;
+    this.timers[reminder.id] = setTimeout(() => this.showNotification(reminder), fiveMinutes);
+    console.log(`Notificación reprogramada para "${reminder.title}" en 5 minutos`);
+    this.showToast('info', 'Recordatorio pospuesto', `"${reminder.title}" se recordará en 5 minutos.`);
+  }
+
+  async showNotification(reminder) {
+    if (reminder.completed) return; // Don't show for completed reminders
+    if (!this.hasPermission) {
+      const granted = await this.requestPermission();
+      if (!granted) return;
+    }
+    try {
+      if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        const registration = await navigator.serviceWorker.ready;
+        await registration.showNotification(reminder.title, {
+          body: this.getNotificationBody(reminder),
+          icon: 'https://placehold.co/192x192/3498db/ffffff?text=N', // Placeholder
+          badge: 'https://placehold.co/96x96/3498db/ffffff?text=B', // Placeholder
+          data: { reminderId: reminder.id, url: window.location.origin },
+          actions: [
+            { action: 'complete', title: 'Completar' },
+            { action: 'snooze', title: 'Posponer 5 min' }
+          ],
+          requireInteraction: true, // Keep notification until interacted
+          tag: `reminder-${reminder.id}` // Tag to replace existing notification for same reminder
+        });
+      } else { // Fallback for browsers without active SW or for testing
+        const notification = new Notification(reminder.title, {
+          body: this.getNotificationBody(reminder),
+          icon: 'https://placehold.co/192x192/3498db/ffffff?text=N', // Placeholder
+          tag: `reminder-${reminder.id}`
+        });
+        notification.onclick = () => {
+          window.focus();
+          // Potentially navigate or open the specific reminder
+          notification.close();
+        };
+        // No automatic reschedule for fallback, SW handles this better
+      }
+    } catch (error) {
+      console.error('Error al mostrar la notificación:', error);
+      this.showToast('error', 'Error de Notificación', 'No se pudo mostrar la notificación.');
+    }
+  }
+
+  cancelNotification(reminderId) {
+    if (this.timers[reminderId]) {
+      clearTimeout(this.timers[reminderId]);
+      delete this.timers[reminderId];
+      console.log(`Notificación cancelada para el recordatorio ID: ${reminderId}`);
+    }
+    // Also attempt to close any visible system notification if SW is available
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.ready.then(registration => {
+            registration.getNotifications({ tag: `reminder-${reminderId}` }).then(notifications => {
+                notifications.forEach(notification => notification.close());
+            });
+        });
+    }
+  }
+
+  getNotificationBody(reminder) {
+    let body = '';
+    if (reminder.assignee) body += `Para: ${reminder.assignee}\n`;
+
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = reminder.description || ""; // Ensure description is not null
+    const textOnly = (tempDiv.textContent || tempDiv.innerText || "").trim();
+    const shortText = textOnly.length > 100 ? textOnly.substring(0, 97) + '...' : textOnly;
+    if (shortText) body += shortText;
+    else if (!reminder.assignee) body = "Es hora de este recordatorio."; // Default if no other info
+
+    return body.trim();
+  }
+
+  async checkPendingNotifications() { // Called periodically
+    try {
+      const pendingReminders = await dbService.getPendingReminders();
+      pendingReminders.forEach(reminder => {
+        if (!reminder.completed) this.showNotification(reminder);
+      });
+    } catch (error) {
+      console.error('Error al comprobar notificaciones pendientes:', error);
+    }
+  }
+}
+const notificationService = new NotificationService();
+
+/**
+ * js/utils/date-utils.js
+ */
+const DateUtils = {
+  formatDate(date, includeTime = true, locale = 'es-ES') { // Added locale
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+    if (includeTime) {
+      options.hour = '2-digit';
+      options.minute = '2-digit';
+    }
+    return dateObj.toLocaleDateString(locale, options);
+  },
+
+  isToday(date) {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    const today = new Date();
+    return dateObj.getDate() === today.getDate() &&
+           dateObj.getMonth() === today.getMonth() &&
+           dateObj.getFullYear() === today.getFullYear();
+  },
+
+  isPast(date) {
+    if (!date) return false;
+    const dateObj = new Date(date);
+    const now = new Date();
+    return dateObj < now; // Does not include "today but past time"
+  },
+  
+  isOverdue(dateStr) { // Checks if date AND time have passed
+    if (!dateStr) return false;
+    const reminderDateTime = new Date(dateStr);
+    return reminderDateTime < new Date();
+  },
+
+  getFutureDate(days, startDate = new Date()) {
+    const date = new Date(startDate);
+    date.setDate(date.getDate() + days);
+    return date;
+  },
+
+  // Corrected: Removed the duplicate definition. This one is more generic.
+  addMinutes(minutes, startDate = new Date()) {
+    const date = new Date(startDate);
+    date.setMinutes(date.getMinutes() + minutes);
+    return date;
+  },
+
+  getTimeRemaining(futureDateStr) {
+    if (!futureDateStr) return '';
+    const future = new Date(futureDateStr);
+    const now = new Date();
+    if (future <= now) return 'Vencido';
+
+    const diffMs = future - now;
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+    if (diffDays > 0) return `En ${diffDays}d ${diffHours}h`;
+    if (diffHours > 0) return `En ${diffHours}h ${diffMinutes}m`;
+    return `En ${diffMinutes}m`;
+  },
+
+  startOfDay(date = new Date()) { // Added optional date param
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  },
+
+  endOfDay(date = new Date()) { // Added optional date param
+    const d = new Date(date);
+    d.setHours(23, 59, 59, 999);
+    return d;
+  }
+};
+
+
+/**
+ * js/components/reminder-editor.js
+ */
+class ReminderEditor {
+  constructor() {
+    this.editor = null;
+    this.currentReminderId = null;
+    this.modal = null; // Will be initialized with Modal helper
+    this.tags = [];
+    this.triggerElement = null;
+    this.isReadOnly = false;
+  }
+
+  init() {
+    this.modalInstance = new Modal('reminderModal'); // Use the helper
+    this.modalElement = this.modalInstance.element;
+    this.reminderForm = document.getElementById('reminder-form');
+    this.saveButton = document.getElementById('save-reminder');
+    this.viewCloseButton = document.getElementById('view-close-reminder'); // New button for read-only
+    this.titleInput = document.getElementById('reminder-title');
+    this.assigneeInput = document.getElementById('reminder-assignee');
+    this.dateInput = document.getElementById('reminder-date');
+    this.timeInput = document.getElementById('reminder-time');
+    this.tagSelection = document.getElementById('tag-selection');
+    this.newTagInput = document.getElementById('new-tag-input');
+    this.addTagButton = document.getElementById('add-tag-btn');
+
+    this.initTinyMCE(); // Initialize TinyMCE
+
+    this.saveButton.addEventListener('click', this.handleSave.bind(this));
+    this.addTagButton.addEventListener('click', this.handleAddTag.bind(this));
+    this.newTagInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        this.handleAddTag();
+      }
+    });
+
+    this.modalElement.addEventListener('shown.bs.modal', () => { // This event might not fire with custom modal
+        if (!this.isReadOnly) this.titleInput.focus();
+    });
+    this.modalElement.addEventListener('hidden.bs.modal', () => { // This event might not fire
+      if (this.triggerElement && this.triggerElement.focus) this.triggerElement.focus();
+      this.triggerElement = null;
+      this.isReadOnly = false; // Reset read-only state
+    });
+  }
+
+  initTinyMCE() {
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    tinymce.init({
+      selector: '#editor-container',
+      height: 250,
+      menubar: false,
+      plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table help wordcount',
+      toolbar: 'undo redo | blocks | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | image link | help',
+      content_style: `body { font-family: Inter, sans-serif; font-size: 14px; line-height: 1.6; } 
+                      body.dark-mode { background-color: #1f2937; color: #f3f4f6; }`, // For iframe
+      skin: isDarkMode ? 'oxide-dark' : 'oxide',
+      content_css: isDarkMode ? 'dark' : 'default', // For content area
+      setup: (editor) => {
+        this.editor = editor;
+        editor.on('init', () => { // Set content after init
+            if (this.initialContent) editor.setContent(this.initialContent);
+            if (this.isReadOnly) editor.setMode('readonly');
+            else editor.setMode('design');
+        });
+        editor.on('focus', () => {
+            editor.editorContainer.classList.add('ring-2', 'ring-blue-500');
+        });
+        editor.on('blur', () => {
+            editor.editorContainer.classList.remove('ring-2', 'ring-blue-500');
+        });
+        editor.on('keyup', () => this.handleTextChange());
+      }
+    });
+  }
+
+
+  openNew(triggerElement) {
+    this.isReadOnly = false;
+    this.triggerElement = triggerElement || document.activeElement;
+    this.currentReminderId = null;
+    document.getElementById('modal-title').textContent = 'Nuevo Recordatorio';
+    this.reminderForm.reset();
+    this.initialContent = ''; // For TinyMCE
+    if (this.editor) this.editor.setContent('');
+
+
+    const now = new Date();
+    now.setHours(now.getHours() + 1); // Default to one hour from now
+    this.dateInput.value = now.toISOString().split('T')[0];
+    this.timeInput.value = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+    this.loadTags();
+    this.toggleEditMode(true);
+    this.modalInstance.show();
+    setTimeout(() => this.titleInput.focus(), 100); // Focus after modal animation
+  }
+
+  async openEdit(reminder, triggerElement, readOnly = false) {
+    this.isReadOnly = readOnly;
+    this.triggerElement = triggerElement || document.activeElement;
+    this.currentReminderId = reminder.id;
+    document.getElementById('modal-title').textContent = readOnly ? 'Ver Recordatorio' : 'Editar Recordatorio';
+
+    this.titleInput.value = reminder.title;
+    this.assigneeInput.value = reminder.assignee || '';
+    const reminderDate = new Date(reminder.date);
+    this.dateInput.value = reminderDate.toISOString().split('T')[0];
+    this.timeInput.value = `${reminderDate.getHours().toString().padStart(2, '0')}:${reminderDate.getMinutes().toString().padStart(2, '0')}`;
+    
+    this.initialContent = reminder.description || ''; // For TinyMCE
+    if (this.editor) {
+        this.editor.setContent(this.initialContent);
+    }
+
+
+    await this.loadTags(reminder.tags || []);
+    this.toggleEditMode(!readOnly);
+    this.modalInstance.show();
+    if (!readOnly) setTimeout(() => this.titleInput.focus(), 100);
+  }
+
+  toggleEditMode(isEditable) {
+    this.titleInput.disabled = !isEditable;
+    this.assigneeInput.disabled = !isEditable;
+    this.dateInput.disabled = !isEditable;
+    this.timeInput.disabled = !isEditable;
+    this.newTagInput.disabled = !isEditable;
+    this.addTagButton.disabled = !isEditable;
+    
+    // Toggle visibility of buttons
+    this.saveButton.classList.toggle('hidden', !isEditable);
+    this.viewCloseButton.textContent = isEditable ? 'Cancelar' : 'Cerrar';
+
+    if (this.editor) {
+        this.editor.setMode(isEditable ? 'design' : 'readonly');
+    }
+    
+    // Disable tag selection clicks if not editable
+    this.tagSelection.querySelectorAll('.tag-badge-selectable').forEach(tagEl => {
+        if (!isEditable) {
+            tagEl.style.pointerEvents = 'none'; // Prevent click
+        } else {
+            tagEl.style.pointerEvents = 'auto';
+        }
+    });
+  }
+
+
+  async loadTags(selectedTags = []) {
+    this.tags = await dbService.getTags();
+    this.tagSelection.innerHTML = '';
+    if (this.tags.length === 0 && this.isReadOnly) {
+        this.tagSelection.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400">Sin etiquetas asignadas.</p>';
+        return;
+    }
+    this.tags.forEach(tag => {
+      const isSelected = selectedTags.includes(tag.id);
+      const tagElement = document.createElement('span'); // Use span for inline-block badges
+      // Base classes for all tags in selection area
+      tagElement.className = `tag-badge-selectable inline-flex items-center px-3 py-1 rounded-full text-sm font-medium cursor-pointer transition-all duration-150 ease-in-out`;
+      
+      // Apply color and selection state
+      if (isSelected) {
+        tagElement.classList.add('bg-blue-500', 'text-white', 'ring-2', 'ring-blue-300');
+        tagElement.setAttribute('data-selected', 'true');
+      } else {
+        tagElement.classList.add('bg-gray-200', 'dark:bg-gray-600', 'text-gray-700', 'dark:text-gray-200', 'hover:bg-gray-300', 'dark:hover:bg-gray-500');
+        tagElement.setAttribute('data-selected', 'false');
+      }
+      tagElement.style.backgroundColor = isSelected ? tag.color : ''; // Use custom color if selected, else default
+      if (!isSelected) { // If not selected, use custom color for background with some opacity or border
+          tagElement.style.backgroundColor = tag.color + '33'; // Add alpha for unselected custom color
+          tagElement.style.borderColor = tag.color;
+          tagElement.classList.add('border');
+      } else {
+          tagElement.style.backgroundColor = tag.color; // Full custom color when selected
+      }
+
+
+      tagElement.setAttribute('data-id', tag.id);
+      tagElement.textContent = tag.name;
+
+      tagElement.addEventListener('click', () => {
+        if (this.isReadOnly) return; // Don't allow changes in read-only mode
+        const currentlySelected = tagElement.getAttribute('data-selected') === 'true';
+        if (currentlySelected) {
+          tagElement.setAttribute('data-selected', 'false');
+          tagElement.classList.remove('bg-blue-500', 'text-white', 'ring-2', 'ring-blue-300');
+          tagElement.classList.add('bg-gray-200', 'dark:bg-gray-600', 'text-gray-700', 'dark:text-gray-200', 'hover:bg-gray-300', 'dark:hover:bg-gray-500');
+          tagElement.style.backgroundColor = tag.color + '33';
+          tagElement.style.borderColor = tag.color;
+          tagElement.classList.add('border');
+
+        } else {
+          tagElement.setAttribute('data-selected', 'true');
+          tagElement.classList.add('bg-blue-500', 'text-white', 'ring-2', 'ring-blue-300');
+          tagElement.classList.remove('bg-gray-200', 'dark:bg-gray-600', 'text-gray-700', 'dark:text-gray-200', 'hover:bg-gray-300', 'dark:hover:bg-gray-500');
+          tagElement.style.backgroundColor = tag.color;
+          tagElement.classList.remove('border');
+        }
+      });
+      this.tagSelection.appendChild(tagElement);
+    });
+  }
+
+  handleTextChange() {
+    if (!this.editor || this.isReadOnly) return;
+    const content = this.editor.getContent({ format: 'text' });
+    const firstLine = content.split('\n')[0].trim();
+    if (firstLine && !this.titleInput.value) {
+      this.titleInput.value = firstLine.substring(0, 100); // Limit title length
+    }
+  }
+
+  async handleSave() {
+    if (!this.reminderForm.checkValidity()) {
+      this.reminderForm.reportValidity(); // Native browser validation
+      return;
+    }
+
+    const title = this.titleInput.value.trim();
+    if (!title) {
+        notificationService.showToast('error', 'Título Requerido', 'Por favor, ingrese un título para el recordatorio.');
+        this.titleInput.focus();
+        return;
+    }
+
+    const description = this.editor ? this.editor.getContent() : '';
+    const date = this.dateInput.value;
+    const time = this.timeInput.value;
+    const assignee = this.assigneeInput.value.trim();
+    const reminderDateTime = new Date(`${date}T${time}`);
+
+    if (isNaN(reminderDateTime.getTime())) {
+        notificationService.showToast('error', 'Fecha Inválida', 'Por favor, ingrese una fecha y hora válidas.');
+        return;
+    }
+
+    const selectedTags = Array.from(this.tagSelection.querySelectorAll('[data-selected="true"]'))
+      .map(el => parseInt(el.getAttribute('data-id')));
+
+    const reminder = {
+      title,
+      description,
+      date: reminderDateTime.toISOString(),
+      assignee: assignee || null,
+      tags: selectedTags,
+      completed: this.currentReminderId ? (await dbService.getReminder(this.currentReminderId)).completed : false, // Preserve completed state on edit
+      created: this.currentReminderId ? (await dbService.getReminder(this.currentReminderId)).created : new Date().toISOString(),
+      modified: new Date().toISOString()
+    };
+
+    if (this.currentReminderId) reminder.id = this.currentReminderId;
+
+    try {
+      const savedId = await dbService.saveReminder(reminder);
+      reminder.id = this.currentReminderId || savedId; // Ensure ID is set for notification scheduling
+      
+      if (!reminder.completed) { // Only schedule if not completed
+        notificationService.scheduleNotification(reminder);
+      } else {
+        notificationService.cancelNotification(reminder.id); // Cancel if it was completed during edit
+      }
+
+      this.modalInstance.hide();
+      window.dispatchEvent(new CustomEvent('reminders-updated'));
+      notificationService.showToast('success', 'Recordatorio Guardado', `"${reminder.title}" ha sido guardado.`);
+    } catch (error) {
+      console.error('Error al guardar recordatorio:', error);
+      notificationService.showToast('error', 'Error al Guardar', 'No se pudo guardar el recordatorio.');
+    }
+  }
+
+  async handleAddTag() {
+    const tagName = this.newTagInput.value.trim();
+    if (!tagName) return;
+
+    const randomColor = `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
+    try {
+      const tagId = await dbService.saveTag({ name: tagName, color: randomColor });
+      this.newTagInput.value = '';
+      const selectedTagIds = Array.from(this.tagSelection.querySelectorAll('[data-selected="true"]'))
+                                .map(el => parseInt(el.getAttribute('data-id')));
+      await this.loadTags([...selectedTagIds, tagId]); // Reload tags and keep current selections + new one
+      window.dispatchEvent(new CustomEvent('tags-updated')); // Notify tag manager
+      notificationService.showToast('success', 'Etiqueta Agregada', `La etiqueta "${tagName}" ha sido creada.`);
+    } catch (error) {
+      console.error('Error al añadir etiqueta:', error);
+      notificationService.showToast('error', 'Error de Etiqueta', error.message || 'No se pudo añadir la etiqueta.');
+    }
+  }
+}
+const reminderEditor = new ReminderEditor();
+
+
+/**
+ * js/components/reminder-list.js
+ */
+class ReminderList {
+  constructor() {
+    this.reminders = [];
+    this.currentFilter = { sortBy: 'date', sortDir: 'asc' }; // Default sort
+    this.listElement = null;
+    this.deleteModal = null; // Will be initialized
+    this.reminderToDelete = null;
+  }
+
+  init() {
+    this.listElement = document.getElementById('reminders-list');
+    this.deleteModalInstance = new Modal('deleteModal'); // Use helper
+    this.confirmDeleteBtn = document.getElementById('confirm-delete');
+    this.searchInput = document.getElementById('search-input');
+
+    // Desktop nav
+    this.navAll = document.getElementById('nav-all');
+    this.navToday = document.getElementById('nav-today');
+    this.navUpcoming = document.getElementById('nav-upcoming');
+    // Mobile nav
+    this.navAllMobile = document.getElementById('nav-all-mobile');
+    this.navTodayMobile = document.getElementById('nav-today-mobile');
+    this.navUpcomingMobile = document.getElementById('nav-upcoming-mobile');
+
+    this.newReminderBtn = document.getElementById('btn-new-reminder');
+    this.viewTitle = document.getElementById('current-view-title');
+
+    this.searchInput.addEventListener('input', () => this.handleSearchDebounced());
+
+    const setViewHandler = (view) => (e) => {
+        e.preventDefault();
+        this.setView(view);
+    };
+
+    this.navAll.addEventListener('click', setViewHandler('all'));
+    this.navToday.addEventListener('click', setViewHandler('today'));
+    this.navUpcoming.addEventListener('click', setViewHandler('upcoming'));
+    this.navAllMobile.addEventListener('click', setViewHandler('all'));
+    this.navTodayMobile.addEventListener('click', setViewHandler('today'));
+    this.navUpcomingMobile.addEventListener('click', setViewHandler('upcoming'));
+
+    this.newReminderBtn.addEventListener('click', (e) => reminderEditor.openNew(e.currentTarget));
+    this.confirmDeleteBtn.addEventListener('click', this.confirmDelete.bind(this));
+
+    window.addEventListener('reminders-updated', this.loadReminders.bind(this));
+    window.addEventListener('tags-updated', this.loadReminders.bind(this)); // Reload reminders if tags changed (e.g. name/color)
+    
+    this.setView('all'); // Load initial view
+  }
+
+  handleSearchDebounced = (() => {
+    let timeout;
+    return () => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            const searchTerm = this.searchInput.value.trim();
+            this.setFilter({ search: searchTerm || undefined });
+        }, 300); // 300ms debounce
+    };
+  })();
+
+  async loadReminders() {
+    try {
+      this.reminders = await dbService.getReminders(this.currentFilter);
+      this.renderReminders();
+    } catch (error) {
+      console.error('Error al cargar recordatorios:', error);
+      this.listElement.innerHTML = `<div class="p-4 bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-200 rounded-lg">Error al cargar recordatorios. Intenta de nuevo.</div>`;
+    }
+  }
+
+  renderReminders() {
+    if (!this.listElement) return;
+    this.listElement.innerHTML = '';
+
+    if (this.reminders.length === 0) {
+      let message = "No hay recordatorios que mostrar.";
+      if (this.currentFilter.search) message = `No hay recordatorios que coincidan con tu búsqueda "${this.currentFilter.search}".`;
+      else if (this.currentFilter.tag) message = "No hay recordatorios con esta etiqueta.";
+      else if (this.currentFilter.date) message = "No hay recordatorios para hoy.";
+      else if (this.currentFilter.upcoming) message = "No hay recordatorios próximos.";
+      
+      this.listElement.innerHTML = `
+        <div class="text-center py-10 px-6 bg-white dark:bg-gray-800 rounded-lg shadow">
+            <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <h3 class="mt-2 text-lg font-medium text-gray-900 dark:text-gray-100">¡Todo despejado!</h3>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">${message}</p>
+            <div class="mt-6">
+                <button type="button" class="btn-primary" id="empty-state-new-reminder">
+                    <i class="bi bi-plus-lg mr-1"></i>
+                    Crear Nuevo Recordatorio
+                </button>
+            </div>
+        </div>`;
+        document.getElementById('empty-state-new-reminder')?.addEventListener('click', (e) => reminderEditor.openNew(e.currentTarget));
+      return;
+    }
+
+    this.reminders.forEach(reminder => {
+      const card = this.createReminderCard(reminder);
+      this.listElement.appendChild(card);
+    });
+  }
+
+  createReminderCard(reminder) {
+    const card = document.createElement('div');
+    card.className = `bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden transition-all duration-200 ease-in-out hover:shadow-xl relative`;
+    card.setAttribute('data-id', reminder.id);
+
+    let borderColorClass = 'border-l-4 border-blue-500 dark:border-blue-400'; // Default
+    const isOverdue = !reminder.completed && DateUtils.isOverdue(reminder.date);
+    const isToday = !reminder.completed && DateUtils.isToday(reminder.date) && !isOverdue;
+
+    if (reminder.completed) borderColorClass = 'border-l-4 border-green-500 dark:border-green-400 opacity-70 dark:opacity-60';
+    else if (isOverdue) borderColorClass = 'border-l-4 border-red-500 dark:border-red-400';
+    else if (isToday) borderColorClass = 'border-l-4 border-yellow-500 dark:border-yellow-400';
+    card.classList.add(borderColorClass);
+
+    const reminderDate = new Date(reminder.date);
+    const formattedDate = DateUtils.formatDate(reminderDate, true);
+    const timeRemaining = reminder.completed ? 'Completado' : DateUtils.getTimeRemaining(reminder.date);
+
+
+    card.innerHTML = `
+      <div class="p-5">
+        <div class="flex justify-between items-start">
+          <h5 class="text-lg font-semibold ${reminder.completed ? 'line-through text-gray-500 dark:text-gray-400' : 'text-gray-800 dark:text-gray-100'} mb-1">
+            ${reminder.title}
+          </h5>
+          <label class="flex items-center cursor-pointer ml-2">
+            <input type="checkbox" class="toggle-complete form-checkbox h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" ${reminder.completed ? 'checked' : ''}>
+            <span class="ml-2 text-sm ${reminder.completed ? 'text-gray-500' : 'text-gray-700 dark:text-gray-300'}">Hecho</span>
+          </label>
+        </div>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
+          <i class="bi bi-clock mr-1"></i> ${formattedDate}
+          <span class="mx-1">|</span>
+          <span class="${isOverdue ? 'text-red-500 dark:text-red-400 font-semibold' : (isToday ? 'text-yellow-600 dark:text-yellow-400 font-semibold' : '')}">${timeRemaining}</span>
+        </p>
+        ${reminder.assignee ? `<p class="text-sm text-gray-600 dark:text-gray-300 mb-2"><i class="bi bi-person mr-1"></i> ${reminder.assignee}</p>` : ''}
+        
+        ${this.renderReminderTags(reminder)}
+        
+        <div class="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700 flex flex-wrap gap-2 justify-end">
+          <button class="btn-secondary-outline text-xs px-2 py-1 view-reminder">
+            <i class="bi bi-eye"></i> Ver
+          </button>
+          <button class="btn-secondary-outline text-xs px-2 py-1 edit-reminder ${reminder.completed ? 'hidden' : ''}">
+            <i class="bi bi-pencil"></i> Editar
+          </button>
+          <button class="btn-danger text-xs px-2 py-1 delete-reminder">
+            <i class="bi bi-trash"></i> Eliminar
+          </button>
+        </div>
+      </div>
+    `;
+
+    card.querySelector('.toggle-complete').addEventListener('change', (e) => this.toggleComplete(reminder.id, e.target.checked));
+    card.querySelector('.view-reminder').addEventListener('click', (e) => this.viewReminder(reminder.id, e.currentTarget));
+    const editBtn = card.querySelector('.edit-reminder');
+    if (editBtn) editBtn.addEventListener('click', (e) => this.editReminder(reminder.id, e.currentTarget));
+    card.querySelector('.delete-reminder').addEventListener('click', () => this.deleteReminder(reminder.id));
+    return card;
+  }
+
+  renderReminderTags(reminder) {
+    if (!reminder.tags || reminder.tags.length === 0) return '<div class="mt-2"></div>'; // Placeholder for consistent spacing
+    const tagsHTML = reminder.tags.map(tagId => {
+      const tag = tagManager.getTagById(tagId); // Assumes tagManager is globally available and has tags loaded
+      if (!tag) return '';
+      return `<span class="inline-block text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full" style="background-color: ${tag.color}33; color: ${tag.color}; border: 1px solid ${tag.color};">
+                ${tag.name}
+              </span>`;
+    }).join('');
+    return `<div class="tags-container mt-2 mb-1 flex flex-wrap gap-1">${tagsHTML}</div>`;
+  }
+
+  async toggleComplete(id, completed) {
+    try {
+      const reminder = await dbService.getReminder(id);
+      if (!reminder) throw new Error('Recordatorio no encontrado');
+      reminder.completed = completed;
+      reminder.modified = new Date().toISOString();
+      await dbService.saveReminder(reminder);
+
+      if (completed) {
+        notificationService.cancelNotification(id);
+        notificationService.showToast('info', 'Tarea Completada', `"${reminder.title}" marcada como completada.`);
+      } else {
+        notificationService.scheduleNotification(reminder); // Re-schedule if uncompleted
+         notificationService.showToast('info', 'Tarea Pendiente', `"${reminder.title}" marcada como pendiente.`);
+      }
+      this.loadReminders(); // Refresh list
+    } catch (error) {
+      console.error('Error al cambiar estado del recordatorio:', error);
+      notificationService.showToast('error', 'Error', 'No se pudo actualizar el estado.');
+    }
+  }
+
+  async viewReminder(id, triggerElement) {
+    const reminder = await dbService.getReminder(id);
+    if (reminder) reminderEditor.openEdit(reminder, triggerElement, true); // Open in read-only mode
+    else notificationService.showToast('error', 'Error', 'Recordatorio no encontrado.');
+  }
+
+  async editReminder(id, triggerElement) {
+    const reminder = await dbService.getReminder(id);
+    if (reminder) reminderEditor.openEdit(reminder, triggerElement, false); // Open in editable mode
+    else notificationService.showToast('error', 'Error', 'Recordatorio no encontrado.');
+  }
+
+  deleteReminder(id) {
+    this.reminderToDelete = id;
+    this.deleteModalInstance.show();
+  }
+
+  async confirmDelete() {
+    if (!this.reminderToDelete) return;
+    try {
+      const reminder = await dbService.getReminder(this.reminderToDelete); // Get title before deleting
+      await dbService.deleteReminder(this.reminderToDelete);
+      notificationService.cancelNotification(this.reminderToDelete);
+      this.deleteModalInstance.hide();
+      notificationService.showToast('success', 'Eliminado', `Recordatorio "${reminder ? reminder.title : ''}" eliminado.`);
+      this.reminderToDelete = null;
+      this.loadReminders();
+    } catch (error) {
+      console.error('Error al eliminar recordatorio:', error);
+      notificationService.showToast('error', 'Error', 'No se pudo eliminar el recordatorio.');
+    }
+  }
+
+  setFilter(filter) {
+    this.currentFilter = { ...this.currentFilter, ...filter };
+    // Reset date if 'all' or 'upcoming' is chosen, or if a tag/search is applied without a specific date focus
+    if (filter.viewType === 'all' || filter.viewType === 'upcoming' || (filter.tag !== undefined || filter.search !== undefined)) {
+        if (filter.viewType !== 'today') { // Keep date if specifically filtering for today
+            delete this.currentFilter.date;
+        }
+    }
+    if (filter.viewType === 'upcoming') {
+        this.currentFilter.upcoming = true;
+        delete this.currentFilter.date; // Upcoming overrides specific date
+    } else {
+        delete this.currentFilter.upcoming;
+    }
+
+    this.loadReminders();
+  }
+
+  setView(view) {
+    const navLinks = document.querySelectorAll('.nav-link, .nav-link-mobile');
+    navLinks.forEach(link => link.classList.remove('active', 'bg-blue-700', 'dark:bg-blue-800'));
+    
+    document.querySelectorAll(`#nav-${view}, #nav-${view}-mobile`).forEach(activeLink => {
+        activeLink.classList.add('active', 'bg-blue-700', 'dark:bg-blue-800');
+    });
+
+    let title = '';
+    let filter = { viewType: view }; // Pass viewType to setFilter
+
+    switch (view) {
+      case 'today':
+        title = 'Recordatorios de Hoy';
+        filter.date = DateUtils.startOfDay().toISOString().split('T')[0]; // Filter by current day
+        filter.completed = undefined; // Show both completed and pending for today unless another filter is active
+        filter.sortBy = 'date';
+        filter.sortDir = 'asc';
+        break;
+      case 'upcoming':
+        title = 'Próximos Recordatorios';
+        filter.upcoming = true; // This will be handled in getReminders
+        filter.completed = false;
+        filter.sortBy = 'date';
+        filter.sortDir = 'asc';
+        break;
+      default: // 'all'
+        title = 'Todos los Recordatorios';
+        filter.completed = undefined; // Show all
+        filter.sortBy = 'date'; // Default sort for 'all'
+        filter.sortDir = 'asc';
+        break;
+    }
+    this.viewTitle.textContent = title;
+    this.setFilter(filter);
+  }
+}
+const reminderList = new ReminderList();
+
+/**
+ * js/components/tag-manager.js
+ */
+class TagManager {
+  constructor() {
+    this.tags = [];
+    this.tagListElement = null;
+    this.activeTagFilter = null;
+  }
+
+  async init() {
+    this.tagListElement = document.getElementById('tag-list');
+    this.addTagButton = document.getElementById('btn-add-tag'); // In main section, not modal
+
+    this.addTagButton.addEventListener('click', this.handleAddTagClick.bind(this));
+    window.addEventListener('tags-updated', this.loadTags.bind(this)); // Listen for external updates
+    await this.loadTags();
+  }
+
+  async loadTags() {
+    try {
+      this.tags = await dbService.getTags();
+      this.renderTags();
+    } catch (error) {
+      console.error('Error al cargar etiquetas:', error);
+      this.tagListElement.innerHTML = `<li class="p-3 text-red-500">Error al cargar etiquetas.</li>`;
+    }
+  }
+
+  renderTags() {
+    if (!this.tagListElement) return;
+    this.tagListElement.innerHTML = ''; // Clear existing
+
+    // "Todas las etiquetas" option
+    const allTagsItem = this.createTagListItem({ id: null, name: 'Todas las etiquetas' }, this.tags.length);
+    this.tagListElement.appendChild(allTagsItem);
+
+    if (this.tags.length === 0) {
+         const noTagsLi = document.createElement('li');
+         noTagsLi.className = "p-3 text-sm text-gray-500 dark:text-gray-400 text-center";
+         noTagsLi.textContent = "No has creado etiquetas aún.";
+         this.tagListElement.appendChild(noTagsLi);
+    } else {
+        this.tags.forEach(tag => {
+            const count = reminderList.reminders.filter(r => r.tags && r.tags.includes(tag.id)).length; // Simple count, could be optimized
+            const tagItem = this.createTagListItem(tag, count);
+            this.tagListElement.appendChild(tagItem);
+        });
+    }
+  }
+  
+  createTagListItem(tag, count) {
+    const listItem = document.createElement('li');
+    listItem.className = `flex justify-between items-center px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150 ease-in-out border-b border-gray-200 dark:border-gray-700 last:border-b-0`;
+    if ((this.activeTagFilter === null && tag.id === null) || this.activeTagFilter === tag.id) {
+      listItem.classList.add('bg-blue-50', 'dark:bg-blue-900', 'text-blue-700', 'dark:text-blue-300', 'font-semibold');
+    }
+
+    const nameAndColor = document.createElement('div');
+    nameAndColor.className = 'flex items-center';
+
+    if (tag.id !== null) { // Don't show color dot for "All tags"
+        const colorDot = document.createElement('span');
+        colorDot.className = 'w-3 h-3 rounded-full mr-3 flex-shrink-0';
+        colorDot.style.backgroundColor = tag.color || '#6c757d'; // Default to gray if no color
+        nameAndColor.appendChild(colorDot);
+    }
+    
+    const tagName = document.createElement('span');
+    tagName.textContent = tag.name;
+    tagName.className = 'truncate'; // Prevent long names from breaking layout
+    nameAndColor.appendChild(tagName);
+
+    listItem.appendChild(nameAndColor);
+
+    if (tag.id !== null) { // Actions for specific tags
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'tag-actions flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity'; // Show on hover
+        listItem.classList.add('group'); // For group-hover
+
+        const editButton = document.createElement('button');
+        editButton.className = 'text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 p-1 rounded';
+        editButton.title = 'Editar etiqueta';
+        editButton.innerHTML = '<i class="bi bi-pencil"></i>';
+        editButton.onclick = (e) => { e.stopPropagation(); this.editTag(tag.id, tag.name, tag.color); };
+        actionsDiv.appendChild(editButton);
+
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 p-1 rounded';
+        deleteButton.title = 'Eliminar etiqueta';
+        deleteButton.innerHTML = '<i class="bi bi-trash"></i>';
+        deleteButton.onclick = (e) => { e.stopPropagation(); this.deleteTag(tag.id, tag.name); };
+        actionsDiv.appendChild(deleteButton);
+        listItem.appendChild(actionsDiv);
+    } else { // Count for "All tags"
+        const countBadge = document.createElement('span');
+        countBadge.className = 'text-xs bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 px-2 py-0.5 rounded-full';
+        countBadge.textContent = count; // Show total number of tags
+        listItem.appendChild(countBadge);
+    }
+    
+    listItem.addEventListener('click', () => this.filterByTag(tag.id));
+    return listItem;
+  }
+
+
+  filterByTag(tagId) {
+    this.activeTagFilter = tagId;
+    this.renderTags(); // Re-render to update active state styling
+    reminderList.setFilter({ tag: tagId, viewType: 'tag' }); // Notify reminderList
+  }
+
+  async handleAddTagClick() {
+    const name = prompt('Nombre de la nueva etiqueta:');
+    if (!name || !name.trim()) return;
+
+    const randomColor = `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
+    try {
+      await dbService.saveTag({ name: name.trim(), color: randomColor });
+      await this.loadTags(); // Reload and render
+      reminderEditor.loadTags(); // Update tags in modal too
+      notificationService.showToast('success', 'Etiqueta Creada', `Etiqueta "${name.trim()}" creada.`);
+    } catch (error) {
+      console.error('Error al guardar etiqueta:', error);
+      notificationService.showToast('error', 'Error de Etiqueta', error.message || 'No se pudo crear la etiqueta.');
+    }
+  }
+
+  async editTag(id, currentName, currentColor) {
+    const newName = prompt('Editar nombre de la etiqueta:', currentName);
+    if (!newName || !newName.trim()) return;
+
+    // Simple color editing via prompt for now, ideally a color picker
+    const newColorHex = prompt('Editar color de la etiqueta (ej: #FF0000):', currentColor);
+    const isValidHex = /^#[0-9A-F]{6}$/i.test(newColorHex);
+    if (!isValidHex) {
+        notificationService.showToast('warning', 'Color Inválido', 'El formato del color no es válido. Se usará el color anterior.');
+    }
+    const finalColor = isValidHex ? newColorHex : currentColor;
+
+    try {
+      await dbService.saveTag({ id, name: newName.trim(), color: finalColor });
+      await this.loadTags();
+      reminderEditor.loadTags(); // Update tags in modal
+      reminderList.loadReminders(); // Reminders might need re-rendering if tag names/colors changed
+      notificationService.showToast('success', 'Etiqueta Actualizada', `Etiqueta "${newName.trim()}" actualizada.`);
+    } catch (error) {
+      console.error('Error al editar etiqueta:', error);
+      notificationService.showToast('error', 'Error de Etiqueta', error.message || 'No se pudo actualizar la etiqueta.');
+    }
+  }
+
+  async deleteTag(id, tagName) {
+    if (!confirm(`¿Estás seguro de que quieres eliminar la etiqueta "${tagName}"? Se quitará de todos los recordatorios.`)) return;
+    try {
+      await dbService.deleteTag(id); // This now also handles removing tag from reminders
+      await this.loadTags();
+      reminderEditor.loadTags(); // Update tags in modal
+
+      if (this.activeTagFilter === id) { // If was filtering by this tag
+        this.filterByTag(null); // Reset to "All tags"
+      } else {
+        reminderList.loadReminders(); // Just reload reminders
+      }
+      notificationService.showToast('success', 'Etiqueta Eliminada', `Etiqueta "${tagName}" eliminada.`);
+    } catch (error) {
+      console.error('Error al eliminar etiqueta:', error);
+      notificationService.showToast('error', 'Error de Etiqueta', 'No se pudo eliminar la etiqueta.');
+    }
+  }
+  getTagById(id) {
+    return this.tags.find(tag => tag.id === id);
+  }
+}
+const tagManager = new TagManager();
+
+
+/**
+ * js/utils/export-import.js
+ */
+const exportImportUtils = {
+  init() {
+    this.exportBtn = document.getElementById('btn-export');
+    this.importBtn = document.getElementById('btn-import');
+    this.importFile = document.getElementById('import-file');
+    this.exportImportModalInstance = new Modal('exportImportModal');
+    this.exportImportTitle = document.getElementById('exportImportTitle');
+    this.exportImportBody = document.getElementById('exportImportBody');
+    this.exportImportAction = document.getElementById('exportImportAction');
+
+    this.exportBtn.addEventListener('click', this.handleExport.bind(this));
+    this.importBtn.addEventListener('click', () => this.importFile.click());
+    this.importFile.addEventListener('change', this.handleImportFile.bind(this));
+  },
+
+  async handleExport() {
+    try {
+      const data = await dbService.exportData();
+      const jsonStr = JSON.stringify(data, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+
+      this.exportImportTitle.textContent = 'Exportar Datos';
+      this.exportImportBody.innerHTML = `
+        <p class="text-sm text-gray-700 dark:text-gray-300">Los datos han sido preparados. Haz clic en "Descargar" para guardar.</p>
+        <ul class="mt-2 text-xs text-gray-600 dark:text-gray-400 list-disc list-inside">
+            <li>Fecha de exportación: ${new Date(data.exportDate).toLocaleString()}</li>
+            <li>Recordatorios: ${data.reminders.length}</li>
+            <li>Etiquetas: ${data.tags.length}</li>
+        </ul>`;
+      this.exportImportAction.textContent = 'Descargar';
+      this.exportImportAction.onclick = () => {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `recordatorios-app-export-${new Date().toISOString().slice(0, 10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        this.exportImportModalInstance.hide();
+        notificationService.showToast('success', 'Exportación Exitosa', 'Datos exportados y descarga iniciada.');
+      };
+      this.exportImportModalInstance.show();
+    } catch (error) {
+      console.error('Error al exportar datos:', error);
+      notificationService.showToast('error', 'Error de Exportación', 'No se pudieron exportar los datos.');
+    }
+  },
+
+  handleImportFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target.result);
+        if (!data.reminders || !data.tags) throw new Error("Formato de archivo inválido.");
+
+        this.exportImportTitle.textContent = 'Importar Datos';
+        this.exportImportBody.innerHTML = `
+          <div class="p-3 mb-3 bg-yellow-100 dark:bg-yellow-700 border-l-4 border-yellow-500 dark:border-yellow-400 text-yellow-700 dark:text-yellow-200">
+            <h5 class="font-bold">¡Atención!</h5>
+            <p class="text-sm">Esto reemplazará todos los datos existentes. Esta acción no se puede deshacer.</p>
+          </div>
+          <p class="text-sm text-gray-700 dark:text-gray-300">Información del archivo:</p>
+          <ul class="mt-1 text-xs text-gray-600 dark:text-gray-400 list-disc list-inside">
+            <li>Fecha de exportación: ${new Date(data.exportDate || Date.now()).toLocaleString()}</li>
+            <li>Recordatorios: ${data.reminders.length}</li>
+            <li>Etiquetas: ${data.tags.length}</li>
+          </ul>`;
+        this.exportImportAction.textContent = 'Confirmar Importación';
+        this.exportImportAction.onclick = () => this.confirmImport(data);
+        this.exportImportModalInstance.show();
+      } catch (error) {
+        console.error('Error al leer el archivo de importación:', error);
+        notificationService.showToast('error', 'Error de Importación', `Archivo inválido: ${error.message}`);
+      }
+      event.target.value = ''; // Reset file input
+    };
+    reader.readAsText(file);
+  },
+
+  async confirmImport(data) {
+    try {
+      await dbService.importData(data);
+      await tagManager.loadTags(); // Reload tags first
+      await reminderList.loadReminders(); // Then reminders
+      this.exportImportModalInstance.hide();
+      notificationService.showToast('success', 'Importación Exitosa', 'Datos importados correctamente.');
+    } catch (error) {
+      console.error('Error al importar datos:', error);
+      notificationService.showToast('error', 'Error de Importación', `No se pudieron importar los datos: ${error.message}`);
+    }
+  }
+};
+
+
+/**
+ * js/app.js - Main Application Logic
+ */
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    await dbService.init();
+    await notificationService.init(); // Requests permission if needed
+
+    // Initialize UI Components
+    reminderEditor.init();
+    reminderList.init();
+    tagManager.init();
+    exportImportUtils.init();
+
+    // Initialize Modals (now that DOM is ready)
+    reminderModalInstance = new Modal('reminderModal');
+    deleteModalInstance = new Modal('deleteModal');
+    exportImportModalInstance = new Modal('exportImportModal');
+
+
+    setupAccessibilityHandlers();
+    notificationService.checkPendingNotifications(); // Check for notifications due on load
+    handleURLParameters();
+
+    console.log('Aplicación modernizada inicializada correctamente.');
+    // notificationService.showToast('info','Aplicación Lista', 'Bienvenido a tus recordatorios.');
+
+  } catch (error) {
+    console.error('Error al inicializar la aplicación:', error);
+    notificationService.showToast('error', 'Error de Inicialización', `La aplicación no pudo iniciar: ${error.message}`);
+    // Optionally display a more prominent error on the page itself
+    const appContainer = document.querySelector('main.container');
+    if (appContainer) {
+        appContainer.innerHTML = `<div class="p-4 bg-red-100 dark:bg-red-800 text-red-700 dark:text-red-200 rounded-lg shadow-md">
+            <h3 class="font-bold text-lg">Error Crítico</h3>
+            <p>La aplicación no pudo cargarse correctamente. Por favor, intenta recargar la página o revisa la consola para más detalles.</p>
+            <pre class="mt-2 text-xs whitespace-pre-wrap">${error.stack}</pre>
+        </div>`;
+    }
+  }
+});
+
+function setupAccessibilityHandlers() {
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      // Close any open modal (assuming only one is open at a time)
+      if (!reminderModalInstance.element.classList.contains('hidden')) reminderModalInstance.hide();
+      else if (!deleteModalInstance.element.classList.contains('hidden')) deleteModalInstance.hide();
+      else if (!exportImportModalInstance.element.classList.contains('hidden')) exportImportModalInstance.hide();
+    }
+  });
+  // Further ARIA enhancements can be added here if needed
+}
+
+async function handleURLParameters() { // Made async to use await
+  const urlParams = new URLSearchParams(window.location.search);
+  const completeParam = urlParams.get('complete');
+  if (completeParam) {
+    try {
+        await reminderList.toggleComplete(Number(completeParam), true);
+        notificationService.showToast('success', 'Tarea Completada', 'La tarea ha sido marcada como completada desde la notificación.');
+    } catch (error) {
+        console.error("Error al completar desde URL:", error);
+        notificationService.showToast('error', 'Error', 'No se pudo completar la tarea desde la notificación.');
+    }
+    clearURLParams();
+  }
+
+  const snoozeParam = urlParams.get('snooze');
+  if (snoozeParam) {
+    try {
+        const reminder = await dbService.getReminder(Number(snoozeParam));
+        if (reminder && !reminder.completed) {
+            // The snooze logic is now primarily in notificationService.rescheduleNotification
+            // which is called by the service worker.
+            // Here, we just acknowledge and perhaps update UI or show a toast.
+            notificationService.rescheduleNotification(reminder); // This will set a new timer and show a toast
+        } else if (reminder && reminder.completed) {
+            notificationService.showToast('info', 'Ya Completado', 'Este recordatorio ya estaba completado.');
+        }
+    } catch (error) {
+        console.error("Error al posponer desde URL:", error);
+        notificationService.showToast('error', 'Error', 'No se pudo posponer la tarea desde la notificación.');
+    }
+    clearURLParams();
+  }
+}
+
+function clearURLParams() {
+    window.history.replaceState({}, document.title, window.location.pathname);
+}
+
+
+// Service Worker Messages & Periodic Checks
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', async (event) => { // Made async
+    try {
+      const data = event.data;
+      if (data.type === 'reschedule' && data.reminderId) {
+        const reminder = await dbService.getReminder(data.reminderId);
+        if (reminder && !reminder.completed) {
+          notificationService.rescheduleNotification(reminder); // This will show a toast
+        }
+      }
+      if (data.type === 'notificationError') {
+        notificationService.showToast('error', 'Error de Notificación SW', data.message || 'El Service Worker encontró un problema.');
+      }
+    } catch (error) {
+      console.error('Error al procesar mensaje del Service Worker:', error);
+    }
+  });
+}
+
+// Periodic check for overdue notifications (e.g., if browser was closed)
+setInterval(() => {
+  notificationService.checkPendingNotifications();
+}, 60 * 1000); // Every minute
+
+// Register Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js') // Assuming sw.js is in the root
+      .then(registration => {
+        console.log('Service Worker registrado correctamente. Scope:', registration.scope);
+      })
+      .catch(err => {
+        console.error('Error al registrar Service Worker:', err);
+        notificationService.showToast('error', 'Error de Service Worker', 'No se pudo registrar el service worker para notificaciones.');
+      });
+  });
+}
+
+</script>
 </body>
 </html>
